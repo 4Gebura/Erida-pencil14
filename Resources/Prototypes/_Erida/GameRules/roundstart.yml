@@ -39,6 +39,9 @@
   parent: BaseGameRule
   components:
   - type: BasicStationEventScheduler
+    minMaxEventTiming:
+      min: 420 # 7 min
+      max: 1020 # 15.5 min
     scheduledGameRules: !type:NestedSelector
       tableId: BasicLightGameRulesTable
   - type: SubGamemodes
@@ -55,12 +58,12 @@
   - type: SubGamemodes
     rules:
     - id: Nukeops
-      prob: 0.3
+      prob: 0.17
     - id: Zombie
-      prob: 0.3
+      prob: 0.17
     - id: Wizard
-      prob: 0.3
+      prob: 0.17
     - id: Revolutionary
-      prob: 0.3
+      prob: 0.17
     - id: Xenoborgs
-      prob: 0.2
+      prob: 0.17
