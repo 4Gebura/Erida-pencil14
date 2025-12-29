@@ -1,6 +1,6 @@
 ﻿- type: entity
   id: FirelockFrame
-  parent: [BaseStructureDynamic, BaseDeltaPressureBasic] # Erida
+  parent: BaseStructureDynamic
   name: firelock frame
   description: That is a firelock frame.
   components:
