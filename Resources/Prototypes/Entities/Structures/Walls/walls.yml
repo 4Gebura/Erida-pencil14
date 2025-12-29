@@ -1,6 +1,6 @@
 - type: entity
   abstract: true
-  parent: BaseStructure
+  parent: [BaseStructure, BaseDeltaPressureBasic] # Erida
   id: BaseStructureWall
   name: basewall
   description: Keeps the air in and the greytide out.
@@ -515,7 +515,7 @@
       resistance: 5
 
 - type: entity
-  parent: WallPlastitaniumIndestructible
+  parent: [BaseWall, BaseDeltaPressureReinforced] # Erida
   id: WallPlastitanium
   name: plastitanium wall
   suffix: ""
@@ -584,7 +584,7 @@
             collection: MetalSlam
 
 - type: entity
-  parent: BaseWall
+  parent: [BaseWall, BaseDeltaPressureReinforced] # Erida
   id: WallReinforced
   name: reinforced wall
   components:
@@ -905,7 +905,7 @@
     price: 200
 
 - type: entity
-  parent: BaseWall
+  parent: [BaseWall, BaseDeltaPressureReinforced] # Erida
   id: WallShuttle
   name: shuttle wall
   components:
@@ -1138,7 +1138,7 @@
     fx: EffectRCDDeconstruct8
 
 - type: entity
-  parent: BaseWall
+  parent: [BaseWall, BaseDeltaPressureReinforced] # Erida
   id: WallReinforcedChitin
   name: reinforced chitin
   components:
