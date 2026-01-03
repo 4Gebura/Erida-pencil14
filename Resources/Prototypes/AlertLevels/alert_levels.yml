@@ -98,6 +98,7 @@
       color: LightSeaGreen
       emergencyLightColor: Aqua
       forceEnableEmergencyLights: true
+      shuttleTime: 1200
     enigma:
       announcement: alert-level-enigma-announcement
       selectable: false
