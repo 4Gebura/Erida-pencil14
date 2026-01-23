@@ -1,7 +1,5 @@
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using System.Reflection.Metadata;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Actions;
 using Content.Shared.Administration.Logs;
@@ -12,7 +10,7 @@ using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Examine;
 using Content.Shared.Hands;
-using Content.Shared.Hands.Components;
+using Content.Shared.Hands.Components; // Erida-edit
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Popups;
 using Content.Shared.Projectiles;
@@ -139,9 +137,10 @@ public abstract partial class SharedGunSystem : EntitySystem
         {
             return;
         }
+
         if (ent != GetEntity(msg.Gun))
             return;
-
+        // Erida-start
         if (!GetAllGuns(user.Value, ent, out var otherGuns))
         {
             gun.ShootCoordinates = GetCoordinates(msg.Coordinates);
@@ -168,17 +167,18 @@ public abstract partial class SharedGunSystem : EntitySystem
                 AttemptShoot(user.Value, weapon.Owner, weapon.Comp);
             }
         }
+        // Erida-end
     }
 
     private void OnStopShootRequest(RequestStopShootEvent ev, EntitySessionEventArgs args)
     {
-        var user = args.SenderSession.AttachedEntity;
+        var user = args.SenderSession.AttachedEntity; // Erida-edit
 
         var gunUid = GetEntity(ev.Gun);
 
-        if (user == null ||
+        if (user == null || // Erida-edit
             !TryComp<GunComponent>(gunUid, out var gun) ||
-            !TryGetGun(user.Value, out var ent, out var userGun))
+            !TryGetGun(user.Value, out var ent, out var userGun)) //Erida-edit
         {
             return;
         }
@@ -186,6 +186,7 @@ public abstract partial class SharedGunSystem : EntitySystem
         if (userGun != gun)
             return;
 
+        // Erida-start
         if (!GetAllGuns(user.Value, ent, out var otherGuns))
         {
             StopShooting(gunUid, gun);
@@ -207,6 +208,7 @@ public abstract partial class SharedGunSystem : EntitySystem
                 StopShooting(weapon.Owner, weapon.Comp);
             }
         }
+        // Erida-end
     }
 
     public bool CanShoot(GunComponent component)
@@ -217,6 +219,7 @@ public abstract partial class SharedGunSystem : EntitySystem
         return true;
     }
 
+    // Erida-start
     private bool GetAllGuns(EntityUid entity, EntityUid activeGun, out List<Entity<GunComponent>> weaponsList)
     {
         weaponsList = new List<Entity<GunComponent>>();
@@ -238,6 +241,7 @@ public abstract partial class SharedGunSystem : EntitySystem
 
         return weaponsList.Count > 0;
     }
+    // Erida-end
 
     public bool TryGetGun(EntityUid entity, out EntityUid gunEntity, [NotNullWhen(true)] out GunComponent? gunComp)
     {
@@ -306,10 +310,12 @@ public abstract partial class SharedGunSystem : EntitySystem
         {
             return false;
         }
+
         var toCoordinates = gun.ShootCoordinates;
 
         if (toCoordinates == null)
             return false;
+
         var curTime = Timing.CurTime;
 
         // check if anything wants to prevent shooting
@@ -318,16 +324,21 @@ public abstract partial class SharedGunSystem : EntitySystem
             User = user,
             Used = (gunUid, gun)
         };
+
         RaiseLocalEvent(gunUid, ref prevention);
+
         if (prevention.Cancelled)
             return false;
+
         RaiseLocalEvent(user, ref prevention);
         if (prevention.Cancelled)
             return false;
+
         // Need to do this to play the clicking sound for empty automatic weapons
         // but not play anything for burst fire.
         if (gun.NextFire > curTime)
             return false;
+
         var fireRate = TimeSpan.FromSeconds(1f / gun.FireRateModified);
 
         if (gun.SelectedMode == SelectiveFire.Burst || gun.BurstActivated)
@@ -347,8 +358,10 @@ public abstract partial class SharedGunSystem : EntitySystem
             gun.NextFire += fireRate;
             shots++;
         }
+
         // NextFire has been touched regardless so need to dirty the gun.
         DirtyField(gunUid, gun, nameof(GunComponent.NextFire));
+
         // Get how many shots we're actually allowed to make, due to clip size or otherwise.
         // Don't do this in the loop so we still reset NextFire.
         if (!gun.BurstActivated)
@@ -370,6 +383,7 @@ public abstract partial class SharedGunSystem : EntitySystem
         {
             shots = Math.Min(shots, gun.ShotsPerBurstModified - gun.ShotCounter);
         }
+
         var attemptEv = new AttemptShootEvent(user, null);
         RaiseLocalEvent(gunUid, ref attemptEv);
 
@@ -384,6 +398,7 @@ public abstract partial class SharedGunSystem : EntitySystem
             gun.NextFire = TimeSpan.FromSeconds(Math.Max(lastFire.TotalSeconds + SafetyNextFire, gun.NextFire.TotalSeconds));
             return false;
         }
+
         var fromCoordinates = Transform(user).Coordinates;
         // Remove ammo
         var ev = new TakeAmmoEvent(shots, new List<(EntityUid? Entity, IShootable Shootable)>(), fromCoordinates, user);
@@ -391,6 +406,7 @@ public abstract partial class SharedGunSystem : EntitySystem
         // Listen it just makes the other code around it easier if shots == 0 to do this.
         if (shots > 0)
             RaiseLocalEvent(gunUid, ev);
+
         DebugTools.Assert(ev.Ammo.Count <= shots);
         DebugTools.Assert(shots >= 0);
         UpdateAmmoCount(gunUid);
@@ -399,6 +415,7 @@ public abstract partial class SharedGunSystem : EntitySystem
         // where the gun may be SemiAuto or Burst.
         gun.ShotCounter += shots;
         DirtyField(gunUid, gun, nameof(GunComponent.ShotCounter));
+
         if (ev.Ammo.Count <= 0)
         {
             // triggers effects on the gun if it's empty
@@ -421,8 +438,10 @@ public abstract partial class SharedGunSystem : EntitySystem
                 Audio.PlayPredicted(gun.SoundEmpty, gunUid, user);
                 return false;
             }
+
             return false;
         }
+
         // Handle burstfire
         if (gun.SelectedMode == SelectiveFire.Burst)
         {
