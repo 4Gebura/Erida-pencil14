@@ -56,7 +56,6 @@ public sealed class CardiopulmonaryResuscitationSystem : EntitySystem
         args.Verbs.Add(verb);
     }
 
-    //private void StartCRP(EntityUid сRPer, EntityUid сRPied, CardiopulmonaryResuscitationComponent component)
     private void StartCRP(Entity<CardiopulmonaryResuscitationComponent> entity, ref GetVerbsEvent<AlternativeVerb> args)
     {
         EntityUid сRPer = args.User;
