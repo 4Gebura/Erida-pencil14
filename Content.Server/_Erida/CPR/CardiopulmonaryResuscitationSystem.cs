@@ -47,7 +47,7 @@ public sealed class CardiopulmonaryResuscitationSystem : EntitySystem
         {
             Act = () =>
             {
-                StartCRP(args.User, uid, component);
+                StartCRP((args.Target, component), ref args);
             },
             Text = Loc.GetString("CRP-verb"),
             Priority = 3
@@ -56,23 +56,27 @@ public sealed class CardiopulmonaryResuscitationSystem : EntitySystem
         args.Verbs.Add(verb);
     }
 
-    private void StartCRP(EntityUid сRPer, EntityUid сRPied, CardiopulmonaryResuscitationComponent component)
+    //private void StartCRP(EntityUid сRPer, EntityUid сRPied, CardiopulmonaryResuscitationComponent component)
+    private void StartCRP(Entity<CardiopulmonaryResuscitationComponent> entity, ref GetVerbsEvent<AlternativeVerb> args)
     {
+        EntityUid сRPer = args.User;
+        EntityUid сRPied = args.Target;
+
         if (!CheckMouth(сRPer, сRPied))
             return;
 
         SendPopupMessages(сRPer, сRPied);
 
-        TimeSpan length = TimeSpan.FromSeconds(component.CRPHowLong);
+        TimeSpan length = TimeSpan.FromSeconds(entity.Comp.CRPHowLong);
 
         var ev = new CRPDoAfterEvent();
-        var args = new DoAfterArgs(_entityManager, сRPer, length, ev, сRPied, target: сRPied)
+        var argsDoAfter = new DoAfterArgs(_entityManager, сRPer, length, ev, сRPied, target: сRPied)
         {
             BreakOnMove = true,
             BreakOnDamage = true,
         };
 
-        _doAfterSystem.TryStartDoAfter(args);
+        _doAfterSystem.TryStartDoAfter(argsDoAfter);
     }
     private void CRPDoAfter(EntityUid uid, CardiopulmonaryResuscitationComponent component, CRPDoAfterEvent args)
     {
