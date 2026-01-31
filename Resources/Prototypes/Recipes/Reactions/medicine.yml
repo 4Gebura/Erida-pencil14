@@ -400,7 +400,6 @@
 
 - type: reaction
   id: Saline
-  maxTemp: 373 # Erida edit
   reactants:
     Water:
       amount: 4
