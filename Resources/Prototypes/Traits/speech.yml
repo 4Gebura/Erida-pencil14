@@ -11,8 +11,6 @@
   components:
   - type: Accentless
     removes:
-    - type: RoarAccent # Erida
-    - type: OwOAccent # Erida
     - type: LizardAccent
     - type: MothAccent
     - type: ReplacementAccent

@@ -1,6 +1,6 @@
 ﻿- type: entity
   id: Airlock
-  parent: [BaseStructure, BaseDeltaPressureBasic] # Erida
+  parent: BaseStructure
   name: airlock
   description: It opens, it closes, and maybe crushes you.
   components:
@@ -24,6 +24,7 @@
     - state: closed_unlit
       shader: unshaded
       map: ["enum.DoorVisualLayers.BaseUnlit"]
+      visible: false
     - state: welded
       map: ["enum.WeldableLayers.BaseWelded"]
     - state: bolted_unlit
@@ -86,7 +87,6 @@
     fuel: 5
     time: 3
   - type: Airlock
-    openUnlitVisible: true # Erida
   - type: NavMapDoor
   - type: DoorBolt
   - type: Appearance

@@ -8,6 +8,7 @@ using Content.Server.Roles;
 using Content.Shared.CCVar;
 using Content.Shared.Database;
 using Content.Shared.GameTicking;
+using Content.Shared.Maps;
 using Content.Shared.Mind;
 using Content.Shared.Players;
 using Content.Shared.Preferences;
@@ -393,7 +394,9 @@ namespace Content.Server.GameTicking
                 }
                 else
                 {
-                    profile = HumanoidCharacterProfile.Random();
+                    var speciesToBlacklist =
+                        new HashSet<string>(_cfg.GetCVar(CCVars.ICNewAccountSpeciesBlacklist).Split(","));
+                    profile = HumanoidCharacterProfile.Random(speciesToBlacklist);
                 }
                 readyPlayerProfiles.Add(userId, profile);
             }
@@ -437,7 +440,6 @@ namespace Content.Server.GameTicking
             AnnounceRound();
             UpdateInfoText();
             SendRoundStartedDiscordMessage();
-            RaiseLocalEvent(new RoundStartedEvent(RoundId)); // Corvax
 
 #if EXCEPTION_TOLERANCE
             }
@@ -811,10 +813,7 @@ namespace Content.Server.GameTicking
                     return;
 
                 var mapName = _gameMapManager.GetSelectedMap()?.MapName ?? Loc.GetString("discord-round-notifications-unknown-map");
-                // Erida-start
-                var gameMode = CurrentPreset != null ? Loc.GetString(CurrentPreset.ModeTitle) : Loc.GetString("discord-round-notifications-unknown-gamemode");
-                var content = Loc.GetString("discord-round-notifications-started", ("id", RoundId), ("map", mapName), ("mode", gameMode));
-                // Erida-end
+                var content = Loc.GetString("discord-round-notifications-started", ("id", RoundId), ("map", mapName));
 
                 var payload = new WebhookPayload { Content = content };
 

@@ -1,8 +1,0 @@
-- type: entity
-  parent: [ BaseComputerCircuitboard, BaseInteQContraband ]
-  id: InteQCommsComputerCircuitboard
-  components:
-  - type: Sprite
-    state: cpu_syndicate
-  - type: ComputerBoard
-    prototype: InteQComputerComms

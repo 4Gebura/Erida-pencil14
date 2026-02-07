@@ -51,10 +51,10 @@
       collection: MetalThud
 
 - type: entity
-  name: syndicate jaws of life
+  name: syndicate jaws of death
   parent: [JawsOfLife, BaseSyndicateContraband]
   id: SyndicateJawsOfLife
-  description: Useful for entering the station or its departments.
+  description: Useful for breaking into secure areas and other nefarious activities.
   components:
   - type: Sprite
     sprite: Objects/Tools/jaws_of_life.rsi
@@ -67,6 +67,7 @@
       - state: syn_inhand-right
     size: Normal
   - type: Prying
+    force: true
     speedModifier: 3.0
   - type: MultipleTool
     entries:
@@ -88,36 +89,3 @@
         Blunt: 14
   - type: StaticPrice
     price: 1000
-
-# Erida-edit-start
-- type: entity
-  name: inteq jaws of life
-  parent: [SyndicateJawsOfLife, BaseInteQContraband]
-  id: InteQJawsOfLife
-  description: Useful for entering the station or its departments.
-  components:
-  - type: Sprite
-    sprite: Objects/Tools/jaws_of_life.rsi
-    state: inteq_jaws_pry
-  - type: Item
-    inhandVisuals:
-      left:
-      - state: inteq_inhand-left
-      right:
-      - state: inteq_inhand-right
-    size: Normal
-  - type: MultipleTool
-    entries:
-      - behavior: Prying
-        sprite:
-          sprite: Objects/Tools/jaws_of_life.rsi
-          state: inteq_jaws_pry
-        useSound: /Audio/Items/jaws_pry.ogg
-        changeSound: /Audio/Items/change_jaws.ogg
-      - behavior: Cutting
-        sprite:
-          sprite: Objects/Tools/jaws_of_life.rsi
-          state: inteq_jaws_cutter
-        useSound: /Audio/Items/jaws_cut.ogg
-        changeSound: /Audio/Items/change_jaws.ogg
-# Erida-edit-end

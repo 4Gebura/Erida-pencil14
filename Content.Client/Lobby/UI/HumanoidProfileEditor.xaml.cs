@@ -9,9 +9,9 @@ using Content.Client.Players.PlayTimeTracking;
 using Content.Client.Stylesheets;
 using Content.Client.Sprite;
 using Content.Client.UserInterface.Systems.Guidebook;
+using Content.Shared.Body;
 using Content.Shared.CCVar;
 using Content.Shared.Clothing;
-using Content.Shared.Corvax.CCCVars;
 using Content.Shared.GameTicking;
 using Content.Shared.Guidebook;
 using Content.Shared.Humanoid;
@@ -35,10 +35,6 @@ using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using Direction = Robust.Shared.Maths.Direction;
-using Content.Shared._Erida.Preference;
-using System.Runtime.CompilerServices;
-using Content.Shared._Erida.ScaleOnSpawn;
-using Content.Shared.Prototypes;
 
 namespace Content.Client.Lobby.UI
 {
@@ -55,30 +51,15 @@ namespace Content.Client.Lobby.UI
         private readonly MarkingManager _markingManager;
         private readonly JobRequirementsManager _requirements;
         private readonly LobbyUIController _controller;
+
         private readonly SpriteSystem _sprite;
 
         // CCvar.
         private int _maxNameLength;
-        private int _maxCustomSpeciesLength; // Erida
         private bool _allowFlavorText;
 
         private FlavorText.FlavorText? _flavorText;
         private TextEdit? _flavorTextEdit;
-        // Orion-Start
-        private TextEdit? _flavorTextOOCEdit;
-        private TextEdit? _characterTextEdit;
-        private TextEdit? _greenTextEdit;
-        private TextEdit? _yellowTextEdit;
-        private TextEdit? _redTextEdit;
-        private TextEdit? _tagsTextEdit;
-        private TextEdit? _linksTextEdit;
-        private TextEdit? _nsfwTextEdit;
-        // Orion-End
-        // Erida start
-        private TextEdit? _nsfwLinksTextEdit;
-        private TextEdit? _flavorTextNSFWOOCEdit;
-        private TextEdit? _nsfwTagsTextEdit;
-        // Erida end
 
         // One at a time.
         private LoadoutWindow? _loadoutWindow;
@@ -90,11 +71,6 @@ namespace Content.Client.Lobby.UI
         /// If we're attempting to save.
         /// </summary>
         public event Action? Save;
-
-        /// <summary>
-        /// Entity used for the profile editor preview
-        /// </summary>
-        public EntityUid PreviewDummy;
 
         /// <summary>
         /// Temporary override of their selected job, used to preview roles.
@@ -129,6 +105,8 @@ namespace Content.Client.Lobby.UI
 
         private ISawmill _sawmill;
 
+        private MarkingsViewModel _markingsModel = new();
+
         public HumanoidProfileEditor(
             IClientPreferencesManager preferencesManager,
             IConfigurationManager configurationManager,
@@ -156,8 +134,9 @@ namespace Content.Client.Lobby.UI
             _sprite = _entManager.System<SpriteSystem>();
 
             _maxNameLength = _cfgManager.GetCVar(CCVars.MaxNameLength);
-            _maxCustomSpeciesLength = _cfgManager.GetCVar(CCVars.MaxCustomSpeciesLength); // Erida
             _allowFlavorText = _cfgManager.GetCVar(CCVars.FlavorText);
+
+            Markings.SetModel(_markingsModel);
 
             ImportButton.OnPressed += args =>
             {
@@ -248,35 +227,8 @@ namespace Content.Client.Lobby.UI
             {
                 SpeciesButton.SelectId(args.Id);
                 SetSpecies(_species[args.Id].ID);
-                UpdateHairPickers();
                 OnSkinColorOnValueChanged();
             };
-            // Erida-start
-            IsCustomSpecies.OnPressed += _ =>
-            {
-                CustomSpeciesContainer.Visible = !CustomSpeciesContainer.Visible;
-                if (!IsCustomSpecies.Pressed)
-                    SetCustomSpecies(string.Empty);
-            };
-
-            CustomSpeciesEdit.IsValid = args => args.Length <= _maxCustomSpeciesLength;
-            CustomSpeciesEdit.OnTextChanged += args =>
-            {
-                string formattedMessage = FormattedMessage.RemoveMarkupPermissive(args.Text);
-                if (!string.IsNullOrEmpty(formattedMessage))
-                    SetCustomSpecies(formattedMessage);
-            };
-
-            HeightSlider.OnValueChanged += _ =>
-            {
-                OnHeightValueChanged();
-            };
-
-            WidthSlider.OnValueChanged += _ =>
-            {
-                OnWidthValueChanged();
-            };
-            // Erida-end
 
             #region Skin
 
@@ -294,124 +246,6 @@ namespace Content.Client.Lobby.UI
 
             #endregion
 
-            // Corvax-TTS-Start
-            #region Voice
-
-            if (configurationManager.GetCVar(CCCVars.TTSEnabled))
-            {
-                TTSContainer.Visible = true;
-                InitializeVoice();
-            }
-
-            #endregion
-            // Corvax-TTS-End
-
-            #region Hair
-
-            HairStylePicker.OnMarkingSelect += newStyle =>
-            {
-                if (Profile is null)
-                    return;
-                Profile = Profile.WithCharacterAppearance(
-                    Profile.Appearance.WithHairStyleName(newStyle.id));
-                ReloadPreview();
-            };
-
-            HairStylePicker.OnColorChanged += newColor =>
-            {
-                if (Profile is null)
-                    return;
-                Profile = Profile.WithCharacterAppearance(
-                    Profile.Appearance.WithHairColor(newColor.marking.MarkingColors[0]));
-                UpdateCMarkingsHair();
-                ReloadPreview();
-            };
-
-            FacialHairPicker.OnMarkingSelect += newStyle =>
-            {
-                if (Profile is null)
-                    return;
-                Profile = Profile.WithCharacterAppearance(
-                    Profile.Appearance.WithFacialHairStyleName(newStyle.id));
-                ReloadPreview();
-            };
-
-            FacialHairPicker.OnColorChanged += newColor =>
-            {
-                if (Profile is null)
-                    return;
-                Profile = Profile.WithCharacterAppearance(
-                    Profile.Appearance.WithFacialHairColor(newColor.marking.MarkingColors[0]));
-                UpdateCMarkingsFacialHair();
-                ReloadPreview();
-            };
-
-            HairStylePicker.OnSlotRemove += _ =>
-            {
-                if (Profile is null)
-                    return;
-                Profile = Profile.WithCharacterAppearance(
-                    Profile.Appearance.WithHairStyleName(HairStyles.DefaultHairStyle)
-                );
-                UpdateHairPickers();
-                UpdateCMarkingsHair();
-                ReloadPreview();
-            };
-
-            FacialHairPicker.OnSlotRemove += _ =>
-            {
-                if (Profile is null)
-                    return;
-                Profile = Profile.WithCharacterAppearance(
-                    Profile.Appearance.WithFacialHairStyleName(HairStyles.DefaultFacialHairStyle)
-                );
-                UpdateHairPickers();
-                UpdateCMarkingsFacialHair();
-                ReloadPreview();
-            };
-
-            HairStylePicker.OnSlotAdd += delegate()
-            {
-                if (Profile is null)
-                    return;
-
-                var hair = _markingManager.MarkingsByCategoryAndSpecies(MarkingCategories.Hair, Profile.Species).Keys
-                    .FirstOrDefault();
-
-                if (string.IsNullOrEmpty(hair))
-                    return;
-
-                Profile = Profile.WithCharacterAppearance(
-                    Profile.Appearance.WithHairStyleName(hair)
-                );
-
-                UpdateHairPickers();
-                UpdateCMarkingsHair();
-                ReloadPreview();
-            };
-
-            FacialHairPicker.OnSlotAdd += delegate()
-            {
-                if (Profile is null)
-                    return;
-
-                var hair = _markingManager.MarkingsByCategoryAndSpecies(MarkingCategories.FacialHair, Profile.Species).Keys
-                    .FirstOrDefault();
-
-                if (string.IsNullOrEmpty(hair))
-                    return;
-
-                Profile = Profile.WithCharacterAppearance(
-                    Profile.Appearance.WithFacialHairStyleName(hair)
-                );
-
-                UpdateHairPickers();
-                UpdateCMarkingsFacialHair();
-                ReloadPreview();
-            };
-
-            #endregion Hair
-
             #region SpawnPriority
 
             foreach (var value in Enum.GetValues<SpawnPriorityPreference>())
@@ -427,19 +261,6 @@ namespace Content.Client.Lobby.UI
 
             #endregion SpawnPriority
 
-            // Erida start
-            foreach (var value in Enum.GetValues<CorporationPreference>())
-            {
-                CorporationButton.AddItem(Loc.GetString($"humanoid-profile-editor-preference-corporation-{value.ToString().ToLower()}"), (int)value);
-            }
-
-            CorporationButton.OnItemSelected += args =>
-            {
-                CorporationButton.SelectId(args.Id);
-                SetCorporationPriority((CorporationPreference)args.Id);
-            };
-            // Erida end
-
             #region Eyes
 
             EyeColorPicker.OnEyeColorPicked += newColor =>
@@ -448,7 +269,7 @@ namespace Content.Client.Lobby.UI
                     return;
                 Profile = Profile.WithCharacterAppearance(
                     Profile.Appearance.WithEyeColor(newColor));
-                Markings.CurrentEyeColor = Profile.Appearance.EyeColor;
+                _markingsModel.SetOrganEyeColor(Profile.Appearance.EyeColor);
                 ReloadProfilePreview();
             };
 
@@ -490,10 +311,8 @@ namespace Content.Client.Lobby.UI
 
             TabContainer.SetTabTitle(4, Loc.GetString("humanoid-profile-editor-markings-tab"));
 
-            Markings.OnMarkingAdded += OnMarkingChange;
-            Markings.OnMarkingRemoved += OnMarkingChange;
-            Markings.OnMarkingColorChange += OnMarkingChange;
-            Markings.OnMarkingRankChange += OnMarkingChange;
+            _markingsModel.MarkingsChanged += (_, _) => OnMarkingChange();
+            _markingsModel.MarkingsReset += OnMarkingChange;
 
             #endregion Markings
 
@@ -540,190 +359,23 @@ namespace Content.Client.Lobby.UI
                 _flavorText = new FlavorText.FlavorText();
                 TabContainer.AddChild(_flavorText);
                 TabContainer.SetTabTitle(TabContainer.ChildCount - 1, Loc.GetString("humanoid-profile-editor-flavortext-tab"));
-
                 _flavorTextEdit = _flavorText.CFlavorTextInput;
-                // Erida start
-                _flavorTextNSFWOOCEdit = _flavorText.CFlavorNSFWOOCTextInput;
-                _nsfwLinksTextEdit = _flavorText.CNSFWLinksTextInput;
-                _nsfwTagsTextEdit = _flavorText.CNSFWTagsTextInput;
-                // Erida end
-                // Orion-Start
-                _flavorTextOOCEdit = _flavorText.CFlavorOOCTextInput;
-                _characterTextEdit = _flavorText.CCharacterTextInput;
-                _greenTextEdit = _flavorText.CGreenTextInput;
-                _yellowTextEdit = _flavorText.CYellowTextInput;
-                _redTextEdit = _flavorText.CRedTextInput;
-                _tagsTextEdit = _flavorText.CTagsTextInput;
-                _linksTextEdit = _flavorText.CLinksTextInput;
-                _nsfwTextEdit = _flavorText.CNSFWTextInput;
-
-                // Orion-End
 
                 _flavorText.OnFlavorTextChanged += OnFlavorTextChange;
-                // Orion-Start
-                _flavorText.OnFlavorOOCTextChanged += OnFlavorOOCTextChange;
-                _flavorText.OnCharacterTextChanged += OnCharacterFlavorTextChange;
-                _flavorText.OnGreenTextChanged += OnGreenFlavorTextChange;
-                _flavorText.OnYellowTextChanged += OnYellowFlavorTextChange;
-                _flavorText.OnRedTextChanged += OnRedFlavorTextChange;
-                _flavorText.OnTagsTextChanged += OnTagsFlavorTextChange;
-                _flavorText.OnLinksTextChanged += OnLinksFlavorTextChange;
-                _flavorText.OnNSFWTextChanged += OnNSFWFlavorTextChange;
-                // Orion-End
-                // Erida start
-                _flavorText.OnNSFWLinksTextChanged += OnNSFWLinksFlavorTextChange;
-                _flavorText.OnNSFWFlavorOOCTextChanged += OnFlavorNSFWOOCTextChange;
-                _flavorText.OnNSFWTagsTextChanged += OnNSFWTagsFlavorTextChange;
-                _flavorText.OnFlavorTabChanged += OnTabChanged;
-                // Erida end
             }
             else
             {
                 if (_flavorText == null)
                     return;
 
-                _flavorText.OnFlavorTextChanged -= OnFlavorTextChange;
-                // Orion-Start
-                _flavorText.OnFlavorOOCTextChanged -= OnFlavorOOCTextChange;
-                _flavorText.OnCharacterTextChanged -= OnCharacterFlavorTextChange;
-                _flavorText.OnGreenTextChanged -= OnGreenFlavorTextChange;
-                _flavorText.OnYellowTextChanged -= OnYellowFlavorTextChange;
-                _flavorText.OnRedTextChanged -= OnRedFlavorTextChange;
-                _flavorText.OnTagsTextChanged -= OnTagsFlavorTextChange;
-                _flavorText.OnLinksTextChanged -= OnLinksFlavorTextChange;
-                _flavorText.OnNSFWTextChanged -= OnNSFWFlavorTextChange;
-                // Orion-End
-                // Erida start
-                _flavorText.OnNSFWLinksTextChanged -= OnNSFWLinksFlavorTextChange;
-                _flavorText.OnNSFWFlavorOOCTextChanged -= OnFlavorNSFWOOCTextChange;
-                _flavorText.OnNSFWTagsTextChanged -= OnNSFWTagsFlavorTextChange;
-                _flavorText.OnFlavorTabChanged -= OnTabChanged;
-                // Erida end
-
                 TabContainer.RemoveChild(_flavorText);
+                _flavorText.OnFlavorTextChanged -= OnFlavorTextChange;
                 _flavorText.Dispose();
                 _flavorTextEdit?.Dispose();
-
                 _flavorTextEdit = null;
-                // Orion-Start
-                _flavorTextOOCEdit = null;
-                _characterTextEdit = null;
-                _greenTextEdit = null;
-                _yellowTextEdit = null;
-                _redTextEdit = null;
-                _tagsTextEdit = null;
-                _linksTextEdit = null;
-                _nsfwTextEdit = null;
-                // Orion-End
-                // Erida start
-                _nsfwLinksTextEdit = null;
-                _flavorTextNSFWOOCEdit = null;
-                _nsfwTagsTextEdit = null;
-                // Erida end
-
                 _flavorText = null;
             }
         }
-
-        // Erida start
-        private void UpdateNSFWPreviewVisibility(bool showNsfw)
-        {
-            if (_flavorText == null)
-                return;
-        }
-        private void OnTabChanged(int tab)
-        {
-            switch (tab)
-            {
-                case 3:
-                    UpdateNSFWPreviewVisibility(true);
-                    break;
-                default:
-                    UpdateNSFWPreviewVisibility(false);
-                    break;
-            }
-        }
-        // Erida end
-
-        // Orion-Start
-
-        private void ProcessLinks(string linksText, BoxContainer linksContainer)
-        {
-            if (linksContainer == null)
-                return;
-
-            linksContainer.RemoveAllChildren();
-            if (string.IsNullOrEmpty(linksText))
-                return;
-
-            var links = linksText.Split(new[] { ',', ' ', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var link in links)
-            {
-                if (IsValidUrl(link))
-                {
-                    CreateLinkButton(link, linksContainer); // Erida edit
-                }
-                else
-                {
-                    CreateLinkTextLabel(link, linksContainer); // Erida edit
-                }
-            }
-        }
-
-        private bool IsValidUrl(string url)
-        {
-            return url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-                url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
-                url.StartsWith("www.", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private void CreateLinkButton(string url, BoxContainer linksContainer) // Erida edit
-        {
-            var button = new Button
-            {
-                Text = GetLinkDisplayText(url),
-                ToolTip = Loc.GetString("humanoid-profile-editor-link-tooltip", ("url", url)),
-                HorizontalExpand = true,
-                HorizontalAlignment = HAlignment.Center,
-                StyleClasses = { StyleNano.ButtonOpenBoth }
-            };
-
-            button.OnPressed += _ => OpenLink(url);
-
-            linksContainer.AddChild(button); // Erida edit
-        }
-
-        private void CreateLinkTextLabel(string text, BoxContainer linksContainer) // Erida edit
-        {
-            var label = new Label
-            {
-                Text = text,
-                HorizontalExpand = true,
-                HorizontalAlignment = HAlignment.Center,
-                FontColorOverride = Color.Gray
-            };
-
-            linksContainer.AddChild(label); // Erida edit
-        }
-
-        private string GetLinkDisplayText(string url)
-        {
-            if (url.Length > 40)
-            {
-                return url[..37] + "...";
-            }
-            return url;
-        }
-
-        private void OpenLink(string url)
-        {
-            if (url.StartsWith("www.", StringComparison.OrdinalIgnoreCase))
-                url = "https://" + url;
-
-            var uriOpener = IoCManager.Resolve<IUriOpener>();
-            uriOpener.OpenUri(url);
-        }
-        // Orion-End
 
         /// <summary>
         /// Refreshes traits selector
@@ -865,7 +517,7 @@ namespace Content.Client.Lobby.UI
             {
                 if (!speciesIds.Contains(Profile.Species))
                 {
-                    SetSpecies(SharedHumanoidAppearanceSystem.DefaultSpecies);
+                    SetSpecies(HumanoidCharacterProfile.DefaultSpecies);
                 }
             }
         }
@@ -963,19 +615,10 @@ namespace Content.Client.Lobby.UI
         /// </remarks>
         private void ReloadPreview()
         {
-            _entManager.DeleteEntity(PreviewDummy);
-            PreviewDummy = EntityUid.Invalid;
-
-            if (Profile == null || !_prototypeManager.HasIndex(Profile.Species))
+            if (Profile == null)
                 return;
 
-            PreviewDummy = _controller.LoadProfileEntity(Profile, JobOverride, ShowClothes.Pressed);
-            // Erida-start
-            if (_entManager.TryGetComponent<SpriteComponent>(PreviewDummy, out var spriteComponent))
-                _sprite.SetScale((PreviewDummy, spriteComponent), new Vector2(Profile.Width, Profile.Height));
-            // Erida-end
-            SpriteView.SetEntity(PreviewDummy);
-            _entManager.System<MetaDataSystem>().SetEntityName(PreviewDummy, Profile.Name);
+            SpriteView.LoadPreview(Profile, JobOverride, ShowClothes.Pressed);
 
             // Check and set the dirty flag to enable the save/reset buttons as appropriate.
             SetDirty();
@@ -1003,24 +646,14 @@ namespace Content.Client.Lobby.UI
 
             UpdateNameEdit();
             UpdateFlavorTextEdit();
-            // Orion
             UpdateSexControls();
             UpdateGenderControls();
             UpdateSkinColor();
             UpdateSpawnPriorityControls();
-            UpdateCorporationControls(); // Erida edit
             UpdateAgeEdit();
-            // Erida-start
-            UpdateCustomSpeciesEdit();
-            UpdateSize();
-            // Erida-end
             UpdateEyePickers();
             UpdateSaveButton();
             UpdateMarkings();
-            UpdateTTSVoicesControls(); // Corvax-TTS
-            UpdateHairPickers();
-            UpdateCMarkingsHair();
-            UpdateCMarkingsFacialHair();
 
             RefreshAntags();
             RefreshJobs();
@@ -1036,22 +669,15 @@ namespace Content.Client.Lobby.UI
             }
         }
 
-
         /// <summary>
         /// A slim reload that only updates the entity itself and not any of the job entities, etc.
         /// </summary>
         private void ReloadProfilePreview()
         {
-            if (Profile == null || !_entManager.EntityExists(PreviewDummy))
+            if (Profile == null)
                 return;
 
-            // Erida-start
-            if (_entManager.TryGetComponent<SpriteComponent>(PreviewDummy, out var spriteComponent))
-                _sprite.SetScale((PreviewDummy, spriteComponent), new Vector2(Profile.Width, Profile.Height));
-            // Erida-end
-
-            _entManager.System<HumanoidAppearanceSystem>().LoadProfile(PreviewDummy, Profile);
-
+            SpriteView.ReloadProfilePreview(Profile);
 
             // Check and set the dirty flag to enable the save/reset buttons as appropriate.
             SetDirty();
@@ -1064,7 +690,7 @@ namespace Content.Client.Lobby.UI
             // I.e., do what jobs/antags do.
 
             var guidebookController = UserInterfaceManager.GetUIController<GuidebookUIController>();
-            var species = Profile?.Species ?? SharedHumanoidAppearanceSystem.DefaultSpecies;
+            var species = Profile?.Species ?? HumanoidCharacterProfile.DefaultSpecies;
             var page = DefaultSpeciesGuidebook;
             if (_prototypeManager.HasIndex<GuideEntryPrototype>(species))
                 page = new ProtoId<GuideEntryPrototype>(species.Id); // Gross. See above todo comment.
@@ -1331,140 +957,16 @@ namespace Content.Client.Lobby.UI
 
             Profile = Profile.WithFlavorText(content);
             SetDirty();
-
         }
 
-        // Orion-Start
-        private void OnFlavorOOCTextChange(string content)
+        private void OnMarkingChange()
         {
             if (Profile is null)
                 return;
 
-            Profile = Profile.WithOOCFlavorText(content);
-            SetDirty();
-
-
-        }
-
-        private void OnCharacterFlavorTextChange(string content)
-        {
-            if (Profile is null)
-                return;
-
-            Profile = Profile.WithCharacterText(content);
-            SetDirty();
-
-
-        }
-
-        private void OnGreenFlavorTextChange(string content)
-        {
-            if (Profile is null)
-                return;
-
-            Profile = Profile.WithGreenPreferencesText(content);
-            SetDirty();
-
-
-        }
-
-        private void OnYellowFlavorTextChange(string content)
-        {
-            if (Profile is null)
-                return;
-
-            Profile = Profile.WithYellowPreferencesText(content);
-            SetDirty();
-
-
-        }
-
-        private void OnRedFlavorTextChange(string content)
-        {
-            if (Profile is null)
-                return;
-
-            Profile = Profile.WithRedPreferencesText(content);
-            SetDirty();
-
-
-        }
-
-        private void OnTagsFlavorTextChange(string content)
-        {
-            if (Profile is null)
-                return;
-
-            Profile = Profile.WithTagsText(content);
-            SetDirty();
-
-
-        }
-
-        private void OnLinksFlavorTextChange(string content)
-        {
-            if (Profile is null)
-                return;
-
-            Profile = Profile.WithLinksText(content);
-            SetDirty();
-
-
-        }
-
-        private void OnNSFWFlavorTextChange(string content)
-        {
-            if (Profile is null)
-                return;
-
-            Profile = Profile.WithNSFWPreferencesText(content);
-            SetDirty();
-
-
-        }
-        // Orion-End
-        // Erida start
-        private void OnFlavorNSFWOOCTextChange(string content)
-        {
-            if (Profile is null)
-                return;
-
-            Profile = Profile.WithNSFWOOCFlavorText(content);
-            SetDirty();
-
-
-        }
-
-        private void OnNSFWLinksFlavorTextChange(string content)
-        {
-            if (Profile is null)
-                return;
-
-            Profile = Profile.WithNSFWLinksText(content);
-            SetDirty();
-
-
-        }
-
-        private void OnNSFWTagsFlavorTextChange(string content)
-        {
-            if (Profile is null)
-                return;
-
-            Profile = Profile.WithNSFWTagsText(content);
-            SetDirty();
-
-
-        }
-        // Erida end
-
-        private void OnMarkingChange(MarkingSet markings)
-        {
-            if (Profile is null)
-                return;
-
-            Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithMarkings(markings.GetForwardEnumerator().ToList()));
+            Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithMarkings(_markingsModel.Markings));
             ReloadProfilePreview();
+            SetDirty();
         }
 
         private void OnSkinColorOnValueChanged()
@@ -1486,7 +988,7 @@ namespace Content.Client.Lobby.UI
 
                     var color = strategy.FromUnary(Skin.Value);
 
-                    Markings.CurrentSkinColor = color;
+                    _markingsModel.SetOrganSkinColor(color);
                     Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
 
                     break;
@@ -1501,7 +1003,7 @@ namespace Content.Client.Lobby.UI
 
                     var color = strategy.ClosestSkinColor(_rgbSkinColorSelector.Color);
 
-                    Markings.CurrentSkinColor = color;
+                    _markingsModel.SetOrganSkinColor(color);
                     Profile = Profile.WithCharacterAppearance(Profile.Appearance.WithSkinColor(color));
 
                     break;
@@ -1510,24 +1012,6 @@ namespace Content.Client.Lobby.UI
 
             ReloadProfilePreview();
         }
-
-        // Erida-start
-        private void OnHeightValueChanged()
-        {
-            Profile = Profile?.WithHeight(HeightSlider.Value / 100);
-            HeightLabel.Text = $"{(int)HeightSlider.Value}%";
-
-            ReloadProfilePreview();
-        }
-
-        private void OnWidthValueChanged()
-        {
-            Profile = Profile?.WithWidth(WidthSlider.Value / 100);
-            WidthLabel.Text = $"{(int)WidthSlider.Value}%";
-
-            ReloadProfilePreview();
-        }
-        // Erida-end
 
         protected override void Dispose(bool disposing)
         {
@@ -1543,13 +1027,6 @@ namespace Content.Client.Lobby.UI
         {
             base.EnteredTree();
             ReloadPreview();
-        }
-
-        protected override void ExitedTree()
-        {
-            base.ExitedTree();
-            _entManager.DeleteEntity(PreviewDummy);
-            PreviewDummy = EntityUid.Invalid;
         }
 
         private void SetAge(int newAge)
@@ -1576,8 +1053,7 @@ namespace Content.Client.Lobby.UI
             }
 
             UpdateGenderControls();
-            UpdateTTSVoicesControls(); // Corvax-TTS
-            Markings.SetSex(newSex);
+            _markingsModel.SetOrganSexes(newSex);
             ReloadPreview();
         }
 
@@ -1587,36 +1063,20 @@ namespace Content.Client.Lobby.UI
             ReloadPreview();
         }
 
-        // Corvax-TTS-Start
-        private void SetVoice(string newVoice)
-        {
-            Profile = Profile?.WithVoice(newVoice);
-            IsDirty = true;
-        }
-        // Corvax-TTS-End
-
         private void SetSpecies(string newSpecies)
         {
             Profile = Profile?.WithSpecies(newSpecies);
             OnSkinColorOnValueChanged(); // Species may have special color prefs, make sure to update it.
-            Markings.SetSpecies(newSpecies); // Repopulate the markings tab as well.
+            _markingsModel.OrganData = _markingManager.GetMarkingData(newSpecies);
+            _markingsModel.ValidateMarkings();
             // In case there's job restrictions for the species
             RefreshJobs();
             // In case there's species restrictions for loadouts
             RefreshLoadouts();
             UpdateSexControls(); // update sex for new species
             UpdateSpeciesGuidebookIcon();
-            UpdateSize(); // Erida
             ReloadPreview();
         }
-
-        // Erida-start
-        private void SetCustomSpecies(string newSpecies)
-        {
-            Profile = Profile?.WithCustomSpecies(newSpecies);
-            IsDirty = true;
-        }
-        // Erida-end
 
         private void SetName(string newName)
         {
@@ -1626,7 +1086,7 @@ namespace Content.Client.Lobby.UI
             if (!IsDirty)
                 return;
 
-            _entManager.System<MetaDataSystem>().SetEntityName(PreviewDummy, newName);
+            SpriteView.SetName(newName);
         }
 
         private void SetSpawnPriority(SpawnPriorityPreference newSpawnPriority)
@@ -1634,14 +1094,6 @@ namespace Content.Client.Lobby.UI
             Profile = Profile?.WithSpawnPriorityPreference(newSpawnPriority);
             SetDirty();
         }
-
-        // Erida start
-        private void SetCorporationPriority(CorporationPreference newCorporation)
-        {
-            Profile = Profile?.WithCorporationPreference(newCorporation);
-            SetDirty();
-        }
-        // Erida end
 
         public bool IsDirty
         {
@@ -1661,123 +1113,18 @@ namespace Content.Client.Lobby.UI
             NameEdit.Text = Profile?.Name ?? "";
         }
 
-        // Orion-Edit-Start
         private void UpdateFlavorTextEdit()
         {
             if (_flavorTextEdit != null)
             {
                 _flavorTextEdit.TextRope = new Rope.Leaf(Profile?.FlavorText ?? "");
             }
-
-            if (_flavorTextOOCEdit != null)
-            {
-                _flavorTextOOCEdit.TextRope = new Rope.Leaf(Profile?.OOCFlavorText ?? "");
-            }
-
-            if (_characterTextEdit != null)
-            {
-                _characterTextEdit.TextRope = new Rope.Leaf(Profile?.CharacterFlavorText ?? "");
-            }
-
-            if (_greenTextEdit != null)
-            {
-                _greenTextEdit.TextRope = new Rope.Leaf(Profile?.GreenFlavorText ?? "");
-            }
-
-            if (_yellowTextEdit != null)
-            {
-                _yellowTextEdit.TextRope = new Rope.Leaf(Profile?.YellowFlavorText ?? "");
-            }
-
-            if (_redTextEdit != null)
-            {
-                _redTextEdit.TextRope = new Rope.Leaf(Profile?.RedFlavorText ?? "");
-            }
-
-            if (_tagsTextEdit != null)
-            {
-                _tagsTextEdit.TextRope = new Rope.Leaf(Profile?.TagsFlavorText ?? "");
-            }
-
-            if (_linksTextEdit != null)
-            {
-                _linksTextEdit.TextRope = new Rope.Leaf(Profile?.LinksFlavorText ?? "");
-            }
-
-            if (_nsfwTextEdit != null)
-            {
-                _nsfwTextEdit.TextRope = new Rope.Leaf(Profile?.NSFWFlavorText ?? "");
-            }
-            // Erida start
-            if (_flavorTextNSFWOOCEdit != null)
-            {
-                _flavorTextNSFWOOCEdit.TextRope = new Rope.Leaf(Profile?.NSFWOOCFlavorText ?? "");
-            }
-            if (_nsfwLinksTextEdit != null)
-            {
-                _nsfwLinksTextEdit.TextRope = new Rope.Leaf(Profile?.NSFWLinksFlavorText ?? "");
-            }
-            if (_nsfwTagsTextEdit != null)
-            {
-                _nsfwTagsTextEdit.TextRope = new Rope.Leaf(Profile?.NSFWTagsFlavorText ?? "");
-            }
-            // Erida end
         }
-        // Orion-Edit-End
 
         private void UpdateAgeEdit()
         {
             AgeEdit.Text = Profile?.Age.ToString() ?? "";
         }
-
-        // Erida-start
-        private void UpdateCustomSpeciesEdit()
-        {
-            IsCustomSpecies.Pressed = false;
-            CustomSpeciesContainer.Visible = false;
-
-            CustomSpeciesEdit.Text = Profile?.CustomSpecies ?? string.Empty;
-            if (!string.IsNullOrEmpty(Profile?.CustomSpecies))
-            {
-                IsCustomSpecies.Pressed = true;
-                CustomSpeciesContainer.Visible = true;
-            }
-        }
-
-        private void UpdateSize()
-        {
-            if (Profile?.Height is null || Profile?.Width is null)
-                return;
-
-            var species = _prototypeManager.Index(Profile.Species).Prototype;
-            var mob_species = _prototypeManager.Index(species);
-
-            if (_prototypeManager.Resolve(mob_species, out var mobSpeciesProto) &&
-                mobSpeciesProto.HasComponent<ScaleOnSpawnComponent>())
-            {
-                HeightContainer.Visible = false;
-                WidthContainer.Visible = false;
-
-                HeightSlider.Value = 100f;
-                WidthSlider.Value = 100f;
-
-                Profile = Profile?.WithWidth(WidthSlider.Value / 100).WithHeight(WidthSlider.Value / 100);
-                return;
-            }
-
-            HeightContainer.Visible = true;
-            WidthContainer.Visible = true;
-
-            float profileHeight = Profile.Height;
-            float profileWidth = Profile.Width;
-
-            HeightLabel.Text = $"{(int)(Profile.Height == 0 ? 100 : profileHeight * 100)}%";
-            WidthLabel.Text = $"{(int)(Profile.Width == 0 ? 100 : profileWidth * 100)}%";
-
-            HeightSlider.Value = Profile.Height == 0 ? 100 : profileHeight * 100;
-            WidthSlider.Value = Profile.Width == 0 ? 100 : profileWidth * 100;
-        }
-        // Erida-end
 
         /// <summary>
         /// Updates selected job priorities to the profile's.
@@ -1888,9 +1235,9 @@ namespace Content.Client.Lobby.UI
                 return;
             }
 
-            Markings.SetData(Profile.Appearance.Markings, Profile.Species,
-                Profile.Sex, Profile.Appearance.SkinColor, Profile.Appearance.EyeColor
-            );
+            _markingsModel.OrganData = _markingManager.GetMarkingData(Profile.Species);
+            _markingsModel.OrganProfileData = _markingManager.GetProfileData(Profile.Species, Profile.Sex, Profile.Appearance.SkinColor, Profile.Appearance.EyeColor);
+            _markingsModel.Markings = Profile.Appearance.Markings;
         }
 
         private void UpdateGenderControls()
@@ -1913,111 +1260,6 @@ namespace Content.Client.Lobby.UI
             SpawnPriorityButton.SelectId((int) Profile.SpawnPriority);
         }
 
-        // Erida start
-        private void UpdateCorporationControls()
-        {
-            if (Profile == null)
-            {
-                return;
-            }
-
-            CorporationButton.SelectId((int)Profile.Corporation);
-        }
-        // Erida end
-
-        private void UpdateHairPickers()
-        {
-            if (Profile == null)
-            {
-                return;
-            }
-            var hairMarking = Profile.Appearance.HairStyleId == HairStyles.DefaultHairStyle
-                ? new List<Marking>()
-                : new() { new(Profile.Appearance.HairStyleId, new List<Color>() { Profile.Appearance.HairColor }) };
-
-            var facialHairMarking = Profile.Appearance.FacialHairStyleId == HairStyles.DefaultFacialHairStyle
-                ? new List<Marking>()
-                : new() { new(Profile.Appearance.FacialHairStyleId, new List<Color>() { Profile.Appearance.FacialHairColor }) };
-
-            HairStylePicker.UpdateData(
-                hairMarking,
-                Profile.Species,
-                1);
-            FacialHairPicker.UpdateData(
-                facialHairMarking,
-                Profile.Species,
-                1);
-        }
-
-        private void UpdateCMarkingsHair()
-        {
-            if (Profile == null)
-            {
-                return;
-            }
-
-            // hair color
-            Color? hairColor = null;
-            if ( Profile.Appearance.HairStyleId != HairStyles.DefaultHairStyle &&
-                _markingManager.Markings.TryGetValue(Profile.Appearance.HairStyleId, out var hairProto)
-            )
-            {
-                if (_markingManager.CanBeApplied(Profile.Species, Profile.Sex, hairProto, _prototypeManager))
-                {
-                    if (_markingManager.MustMatchSkin(Profile.Species, HumanoidVisualLayers.Hair, out var _, _prototypeManager))
-                    {
-                        hairColor = Profile.Appearance.SkinColor;
-                    }
-                    else
-                    {
-                        hairColor = Profile.Appearance.HairColor;
-                    }
-                }
-            }
-            if (hairColor != null)
-            {
-                Markings.HairMarking = new (Profile.Appearance.HairStyleId, new List<Color>() { hairColor.Value });
-            }
-            else
-            {
-                Markings.HairMarking = null;
-            }
-        }
-
-        private void UpdateCMarkingsFacialHair()
-        {
-            if (Profile == null)
-            {
-                return;
-            }
-
-            // facial hair color
-            Color? facialHairColor = null;
-            if ( Profile.Appearance.FacialHairStyleId != HairStyles.DefaultFacialHairStyle &&
-                _markingManager.Markings.TryGetValue(Profile.Appearance.FacialHairStyleId, out var facialHairProto))
-            {
-                if (_markingManager.CanBeApplied(Profile.Species, Profile.Sex, facialHairProto, _prototypeManager))
-                {
-                    if (_markingManager.MustMatchSkin(Profile.Species, HumanoidVisualLayers.Hair, out var _, _prototypeManager))
-                    {
-                        facialHairColor = Profile.Appearance.SkinColor;
-                    }
-                    else
-                    {
-                        facialHairColor = Profile.Appearance.FacialHairColor;
-                    }
-                }
-            }
-            if (facialHairColor != null)
-            {
-                Markings.FacialHairMarking = new (Profile.Appearance.FacialHairStyleId, new List<Color>() { facialHairColor.Value });
-            }
-            else
-            {
-                Markings.FacialHairMarking = null;
-            }
-        }
-
         private void UpdateEyePickers()
         {
             if (Profile == null)
@@ -2025,7 +1267,7 @@ namespace Content.Client.Lobby.UI
                 return;
             }
 
-            Markings.CurrentEyeColor = Profile.Appearance.EyeColor;
+            _markingsModel.SetOrganEyeColor(Profile.Appearance.EyeColor);
             EyeColorPicker.SetData(Profile.Appearance.EyeColor);
         }
 
@@ -2064,7 +1306,7 @@ namespace Content.Client.Lobby.UI
 
             // I tried disabling the button but it looks sorta goofy as it only takes a frame or two to save
             _imaging = true;
-            await _entManager.System<ContentSpriteSystem>().Export(PreviewDummy, dir, includeId: false);
+            await _entManager.System<ContentSpriteSystem>().Export(SpriteView.PreviewDummy, dir, includeId: false);
             _imaging = false;
         }
 
@@ -2084,7 +1326,7 @@ namespace Content.Client.Lobby.UI
 
             try
             {
-                var profile = _entManager.System<HumanoidAppearanceSystem>().FromStream(file, _playerManager.LocalSession!);
+                var profile = HumanoidCharacterProfile.FromStream(file, _playerManager.LocalSession!);
                 var oldProfile = Profile;
                 SetProfile(profile, CharacterSlot);
 
@@ -2116,7 +1358,7 @@ namespace Content.Client.Lobby.UI
 
             try
             {
-                var dataNode = _entManager.System<HumanoidAppearanceSystem>().ToDataNode(Profile);
+                var dataNode = Profile.ToDataNode();
                 await using var writer = new StreamWriter(file.Value.fileStream);
                 dataNode.Write(writer);
             }

@@ -4,17 +4,6 @@
   id: BaseMagazineBoxCaselessRifle
   name: ammunition box (.25 caseless)
   components:
-  # handling sounds edit start
-  - type: EmitSoundOnPickup
-    sound:
-      path: /Audio/_Erida/Items/handling/ammobox_pickup.ogg
-  - type: EmitSoundOnDrop
-    sound:
-      path: /Audio/_Erida/Items/handling/ammobox_drop.ogg
-  - type: EmitSoundOnLand
-    sound:
-      path: /Audio/_Erida/Items/handling/ammobox_drop.ogg
-  # handling sounds edit end
   - type: BallisticAmmoProvider
     mayTransfer: true
     whitelist:
@@ -55,7 +44,7 @@
   parent: BaseMagazineBoxCaselessRifle
   id: MagazineBoxCaselessRiflePractice
   name: ammunition box (.25 caseless practice)
-  description: A cardboard box of .25 caseless rounds. Intended to hold non-harmful chalk ammunition.
+  description: A cardboard box of .25 caseless rounds. Intended to hold harmless practice ammunition.
   components:
   - type: BallisticAmmoProvider
     proto: CartridgeCaselessRiflePractice

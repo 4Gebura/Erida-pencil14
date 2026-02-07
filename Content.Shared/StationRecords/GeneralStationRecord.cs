@@ -1,4 +1,3 @@
-using Content.Shared._Erida.Preference;
 using Robust.Shared.Enums;
 using Robust.Shared.Serialization;
 
@@ -44,22 +43,11 @@ public sealed record GeneralStationRecord
     public string Species = string.Empty;
 
     /// <summary>
-    ///     Species tied to this station record.
-    /// </summary>
-    [DataField]
-    public string CustomSpecies = string.Empty;
-
-    /// <summary>
     ///     Gender identity tied to this station record.
     /// </summary>
     /// <remarks>Sex should be placed in a medical record, not a general record.</remarks>
     [DataField]
     public Gender Gender = Gender.Epicene;
-
-    // Erida start
-    [DataField]
-    public CorporationPreference Corporation = CorporationPreference.Outsource;
-    // Erida end
 
     /// <summary>
     ///     The priority to display this record at.

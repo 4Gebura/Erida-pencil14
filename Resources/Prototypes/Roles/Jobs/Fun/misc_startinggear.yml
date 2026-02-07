@@ -68,7 +68,7 @@
     head: ClothingHeadHatOutlawHat
     outerClothing: ClothingOuterArmorBasicSlim
     back: ClothingBackpackSatchel
-#    pocket1: BaseUplinkRadio25TC 
+    pocket1: BaseUplinkRadio25TC
     pocket2: EnergySword
 
 # Nanotrasen Paramilitary Unit Gear
@@ -126,6 +126,23 @@
     gloves: ClothingHandsGlovesFingerless
   inhand:
     - WeaponMeleeToolboxRobust
+
+#Brigmedic
+
+- type: startingGear
+  id: BrigmedicGear
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitBrigmedic
+    outerClothing: ClothingOuterCoatAMG
+    back: ClothingBackpackBrigmedic
+    shoes: ClothingShoesColorRed
+    gloves: ClothingHandsGlovesNitrile
+    eyes: ClothingEyesHudMedical
+    head: ClothingHeadHatBeretBrigmedic
+    id: BrigmedicPDA
+    ears: ClothingHeadsetBrigmedic
+    mask: ClothingMaskBreathMedicalSecurity
+    belt: ClothingBeltMedicalFilled
 
 # Aghost
 - type: startingGear

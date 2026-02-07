@@ -3,31 +3,20 @@
   id: BasePaper
   abstract: true
   components:
-  # handling sounds edit start
-  - type: EmitSoundOnPickup
-    sound:
-      path: /Audio/_Erida/Items/handling/paper_pickup.ogg
-  - type: EmitSoundOnDrop
-    sound:
-      path: /Audio/_Erida/Items/handling/paper_drop.ogg
-  - type: EmitSoundOnUIOpen
-    sound:
-      path: /Audio/_Erida/Items/handling/paper_use.ogg
-  - type: EmitSoundOnCollide
-    sound:
-      path: /Audio/_Erida/Items/handling/paper_drop.ogg
-  - type: EmitSoundOnThrow
-    sound:
-      path: /Audio/_Erida/Items/handling/paper_throw.ogg
-  # handling sounds edit end
   - type: Tag
     tags:
     - Document
     - Paper
   - type: Appearance
+  - type: Reactive
+    groups:
+      Flammable: [ Touch ]
+      Extinguish: [ Touch ]
+  - type: ExtinguishableSetCollisionWake
   - type: Flammable
     fireSpread: true
     alwaysCombustible: true
+    canExtinguish: true
     damage:
       types:
         Heat: 1
@@ -438,6 +427,8 @@
         insertSound: /Audio/Effects/packetrip.ogg
         ejectSound: /Audio/Effects/packetrip.ogg
         whitelist:
+          components:
+            - Cash
           tags:
             - Paper
   - type: ActivatableUI

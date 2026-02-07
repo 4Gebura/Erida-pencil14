@@ -1,7 +1,0 @@
-- type: entity
-  id: BaseBlueShieldContraband
-  parent: BaseRestrictedContraband
-  abstract: true
-  components:
-  - type: Contraband
-    allowedJobs: [ BlueShieldOfficer ]

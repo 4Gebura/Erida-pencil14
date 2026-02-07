@@ -11,7 +11,6 @@ using Content.Server.Database;
 using Content.Server.Discord;
 using Content.Server.GameTicking;
 using Content.Server.Players.RateLimiting;
-using Content.Server.Preferences.Managers;
 using Content.Shared.Administration;
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
@@ -44,7 +43,6 @@ namespace Content.Server.Administration.Systems
         [Dependency] private readonly IAfkManager _afkManager = default!;
         [Dependency] private readonly IServerDbManager _dbManager = default!;
         [Dependency] private readonly PlayerRateLimitManager _rateLimit = default!;
-        [Dependency] private readonly IServerPreferencesManager _preferenceManager = default!; // Erida edit
 
         [GeneratedRegex(@"^https://discord\.com/api/webhooks/(\d+)/((?!.*/).*)$")]
         private static partial Regex DiscordRegex();
@@ -174,7 +172,7 @@ namespace Content.Server.Administration.Systems
                 }
 
                 // Check if the user has been banned
-                var ban = await _dbManager.GetServerBanAsync(null, e.Session.UserId, null, null);
+                var ban = await _dbManager.GetBanAsync(null, e.Session.UserId, null, null);
                 if (ban != null)
                 {
                     var banMessage = Loc.GetString("bwoink-system-player-banned", ("banReason", ban.Reason));
@@ -663,18 +661,20 @@ namespace Content.Server.Administration.Systems
                 adminPrefix = $"[bold]\\[{senderAdmin.Title}\\][/bold] ";
             }
 
-            // Erida edit start
-            var adminOOCColor = _preferenceManager.GetPreferences(senderSession.UserId).AdminOOCColor;
-
-            if (senderAdmin is not null)
+            if (senderAdmin is not null &&
+                senderAdmin.Flags ==
+                AdminFlags.Adminhelp) // Mentor. Not full admin. That's why it's colored differently.
             {
-                bwoinkText = $"[color={adminOOCColor.ToHex()}]{adminPrefix}{senderSession.Name}[/color]";
+                bwoinkText = $"[color=purple]{adminPrefix}{senderSession.Name}[/color]";
+            }
+            else if (senderAdmin is not null && senderAdmin.HasFlag(AdminFlags.Adminhelp))
+            {
+                bwoinkText = $"[color=red]{adminPrefix}{senderSession.Name}[/color]";
             }
             else
             {
                 bwoinkText = $"{senderSession.Name}";
             }
-            // Erida edit end
 
             bwoinkText = $"{(message.AdminOnly ? Loc.GetString("bwoink-message-admin-only") : !message.PlaySound ? Loc.GetString("bwoink-message-silent") : "")} {bwoinkText}: {escapedText}";
 
@@ -708,17 +708,21 @@ namespace Content.Server.Administration.Systems
                     if (_overrideClientName != string.Empty)
                     {
                         string overrideMsgText;
-
-                        // Erida edit start
-                        if (senderAdmin is not null) // Mentor. Not full admin. That's why it's colored differently.
+                        // Doing the same thing as above, but with the override name. Theres probably a better way to do this.
+                        if (senderAdmin is not null &&
+                            senderAdmin.Flags ==
+                            AdminFlags.Adminhelp) // Mentor. Not full admin. That's why it's colored differently.
                         {
-                            overrideMsgText = $"[color={adminOOCColor.ToHex()}]{adminPrefixWebhook}{_overrideClientName}[/color]";
+                            overrideMsgText = $"[color=purple]{adminPrefixWebhook}{_overrideClientName}[/color]";
+                        }
+                        else if (senderAdmin is not null && senderAdmin.HasFlag(AdminFlags.Adminhelp))
+                        {
+                            overrideMsgText = $"[color=red]{adminPrefixWebhook}{_overrideClientName}[/color]";
                         }
                         else
                         {
                             overrideMsgText = $"{senderSession.Name}"; // Not an admin, name is not overridden.
                         }
-                        // Erida edit end
 
                         overrideMsgText = $"{(message.PlaySound ? "" : "(S) ")}{overrideMsgText}: {escapedText}";
 

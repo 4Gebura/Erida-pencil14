@@ -1,8 +1,7 @@
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Content.Shared._Erida.Preference;
 using Content.Shared.CCVar;
-using Content.Shared.Corvax.TTS;
 using Content.Shared.GameTicking;
 using Content.Shared.Humanoid;
 using Content.Shared.Humanoid.Prototypes;
@@ -15,8 +14,12 @@ using Robust.Shared.Enums;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
+using Robust.Shared.Serialization.Manager;
+using Robust.Shared.Serialization.Markdown;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
+using Robust.Shared;
+using YamlDotNet.RepresentationModel;
 
 namespace Content.Shared.Preferences
 {
@@ -25,9 +28,10 @@ namespace Content.Shared.Preferences
     /// </summary>
     [DataDefinition]
     [Serializable, NetSerializable]
-    public sealed partial class HumanoidCharacterProfile : ICharacterProfile
+    public sealed partial class HumanoidCharacterProfile
     {
-        private static readonly Regex RestrictedNameRegex = new("[^А-Яа-яёЁ0-9' -]"); // Erida
+        public static readonly ProtoId<SpeciesPrototype> DefaultSpecies = "Human";
+        private static readonly Regex RestrictedNameRegex = new(@"[^A-Za-z0-9 '\-]");
         private static readonly Regex ICNameCaseRegex = new(@"^(?<word>\w)|\b(?<word>\w)(?=\w*$)");
 
         /// <summary>
@@ -70,61 +74,11 @@ namespace Content.Shared.Preferences
         [DataField]
         public string FlavorText { get; set; } = string.Empty;
 
-        // Orion-Start
-        [DataField]
-        public string OOCFlavorText { get; set; } = string.Empty;
-
-        [DataField]
-        public string CharacterFlavorText { get; set; } = string.Empty;
-
-        [DataField]
-        public string GreenFlavorText { get; set; } = string.Empty;
-
-        [DataField]
-        public string YellowFlavorText { get; set; } = string.Empty;
-
-        [DataField]
-        public string RedFlavorText { get; set; } = string.Empty;
-
-        [DataField]
-        public string TagsFlavorText { get; set; } = string.Empty;
-
-        [DataField]
-        public string LinksFlavorText { get; set; } = string.Empty;
-
-        [DataField]
-        public string NSFWFlavorText { get; set; } = string.Empty;
-        // Orion-End
-        // Erida start
-        [DataField]
-        public string NSFWOOCFlavorText { get; set; } = string.Empty;
-
-        [DataField]
-        public string NSFWLinksFlavorText { get; set; } = string.Empty;
-
-        [DataField]
-        public string NSFWTagsFlavorText { get; set; } = string.Empty;
-        // Erida end
-
         /// <summary>
         /// Associated <see cref="SpeciesPrototype"/> for this profile.
         /// </summary>
         [DataField]
-        public ProtoId<SpeciesPrototype> Species { get; set; } = SharedHumanoidAppearanceSystem.DefaultSpecies;
-
-        // Erida-start
-        [DataField]
-        public string CustomSpecies { get; set; } = string.Empty;
-
-        [DataField]
-        public float Height { get; set; } = 1f;
-
-        [DataField]
-        public float Width { get; set; } = 1f;
-        // Erida end
-
-        [DataField]
-        public string Voice { get; set; } = SharedHumanoidAppearanceSystem.DefaultVoice; // Corvax-TTS
+        public ProtoId<SpeciesPrototype> Species { get; set; } = DefaultSpecies;
 
         [DataField]
         public int Age { get; set; } = 18;
@@ -134,16 +88,6 @@ namespace Content.Shared.Preferences
 
         [DataField]
         public Gender Gender { get; private set; } = Gender.Male;
-
-        // Erida start
-        [DataField]
-        public CorporationPreference Corporation { get; private set; } = CorporationPreference.Outsource;
-        // Erida end
-
-        /// <summary>
-        /// <see cref="Appearance"/>
-        /// </summary>
-        public ICharacterAppearance CharacterAppearance => Appearance;
 
         /// <summary>
         /// Stores markings, eye colors, etc for the profile.
@@ -182,34 +126,12 @@ namespace Content.Shared.Preferences
         public HumanoidCharacterProfile(
             string name,
             string flavortext,
-            // Orion-Start
-            string oocflavortext,
-            string characterflavortext,
-            string greenflavortext,
-            string yellowflavortext,
-            string redflavortext,
-            string tagsflavortext,
-            string linksflavortext,
-            string nsfwflavortext,
-            // Orion-End
-            // Erida start
-            string nsfwoocflavortext,
-            string nsfwlinksflavortext,
-            string nsfwtagsflavortext,
-            // Erida end
             string species,
-            // Erida-start
-            string customspecies,
-            float height,
-            float width,
-            // Erida-end
-            string voice, // Corvax-TTS
             int age,
             Sex sex,
             Gender gender,
             HumanoidCharacterAppearance appearance,
             SpawnPriorityPreference spawnPriority,
-            CorporationPreference corporationPreference,
             Dictionary<ProtoId<JobPrototype>, JobPriority> jobPriorities,
             PreferenceUnavailableMode preferenceUnavailable,
             HashSet<ProtoId<AntagPrototype>> antagPreferences,
@@ -218,34 +140,12 @@ namespace Content.Shared.Preferences
         {
             Name = name;
             FlavorText = flavortext;
-            // Orion-Start
-            OOCFlavorText = oocflavortext;
-            CharacterFlavorText = characterflavortext;
-            GreenFlavorText = greenflavortext;
-            YellowFlavorText = yellowflavortext;
-            RedFlavorText = redflavortext;
-            TagsFlavorText = tagsflavortext;
-            LinksFlavorText = linksflavortext;
-            NSFWFlavorText = nsfwflavortext;
-            // Orion-End
-            // Erida start
-            NSFWOOCFlavorText = nsfwoocflavortext;
-            NSFWLinksFlavorText = nsfwlinksflavortext;
-            NSFWTagsFlavorText = nsfwtagsflavortext;
-            // Erida end
             Species = species;
-            // Erida-start
-            CustomSpecies = customspecies;
-            Height = height;
-            Width = width;
-            // Erida-end
-            Voice = voice; // Corvax-TTS
             Age = age;
             Sex = sex;
             Gender = gender;
             Appearance = appearance;
             SpawnPriority = spawnPriority;
-            Corporation = corporationPreference; // Erida edit
             _jobPriorities = jobPriorities;
             PreferenceUnavailable = preferenceUnavailable;
             _antagPreferences = antagPreferences;
@@ -271,34 +171,12 @@ namespace Content.Shared.Preferences
         public HumanoidCharacterProfile(HumanoidCharacterProfile other)
             : this(other.Name,
                 other.FlavorText,
-                // Orion-Start
-                other.OOCFlavorText,
-                other.CharacterFlavorText,
-                other.GreenFlavorText,
-                other.YellowFlavorText,
-                other.RedFlavorText,
-                other.TagsFlavorText,
-                other.LinksFlavorText,
-                other.NSFWFlavorText,
-                // Orion-End
-                // Erida start
-                other.NSFWOOCFlavorText,
-                other.NSFWLinksFlavorText,
-                other.NSFWTagsFlavorText,
-                // Erida ends
                 other.Species,
-                // Erida-start
-                other.CustomSpecies,
-                other.Height,
-                other.Width,
-                // Erida-end
-                other.Voice, // Corvax-TTS
                 other.Age,
                 other.Sex,
                 other.Gender,
                 other.Appearance.Clone(),
                 other.SpawnPriority,
-                other.Corporation, // Erida edit
                 new Dictionary<ProtoId<JobPrototype>, JobPriority>(other.JobPriorities),
                 other.PreferenceUnavailable,
                 new HashSet<ProtoId<AntagPrototype>>(other.AntagPreferences),
@@ -309,7 +187,7 @@ namespace Content.Shared.Preferences
 
         /// <summary>
         ///     Get the default humanoid character profile, using internal constant values.
-        ///     Defaults to <see cref="SharedHumanoidAppearanceSystem.DefaultSpecies"/> for the species.
+        ///     Defaults to <see cref="DefaultSpecies"/> for the species.
         /// </summary>
         /// <returns></returns>
         public HumanoidCharacterProfile()
@@ -319,16 +197,19 @@ namespace Content.Shared.Preferences
         /// <summary>
         ///     Return a default character profile, based on species.
         /// </summary>
-        /// <param name="species">The species to use in this default profile. The default species is <see cref="SharedHumanoidAppearanceSystem.DefaultSpecies"/>.</param>
+        /// <param name="species">The species to use in this default profile. The default species is <see cref="DefaultSpecies"/>.</param>
+        /// <param name="sex">Self explanatory.</param>
         /// <returns>Humanoid character profile with default settings.</returns>
-        public static HumanoidCharacterProfile DefaultWithSpecies(string? species = null)
+        public static HumanoidCharacterProfile DefaultWithSpecies(ProtoId<SpeciesPrototype>? species = null, Sex? sex = null)
         {
-            species ??= SharedHumanoidAppearanceSystem.DefaultSpecies;
+            species ??= HumanoidCharacterProfile.DefaultSpecies;
+            sex ??= Sex.Male;
 
             return new()
             {
-                Species = species,
-                Appearance = HumanoidCharacterAppearance.DefaultWithSpecies(species),
+                Species = species.Value,
+                Sex = sex.Value,
+                Appearance = HumanoidCharacterAppearance.DefaultWithSpecies(species.Value, sex.Value),
             };
         }
 
@@ -349,7 +230,7 @@ namespace Content.Shared.Preferences
 
         public static HumanoidCharacterProfile RandomWithSpecies(string? species = null)
         {
-            species ??= SharedHumanoidAppearanceSystem.DefaultSpecies;
+            species ??= HumanoidCharacterProfile.DefaultSpecies;
 
             var prototypeManager = IoCManager.Resolve<IPrototypeManager>();
             var random = IoCManager.Resolve<IRobustRandom>();
@@ -361,14 +242,6 @@ namespace Content.Shared.Preferences
                 sex = random.Pick(speciesPrototype.Sexes);
                 age = random.Next(speciesPrototype.MinAge, speciesPrototype.OldAge); // people don't look and keep making 119 year old characters with zero rp, cap it at middle aged
             }
-
-            // Corvax-TTS-Start
-            var voiceId = random.Pick(prototypeManager
-                .EnumeratePrototypes<TTSVoicePrototype>()
-                .Where(x=>x.RoundStart)
-                .Where(o => CanHaveVoice(o, sex)).ToArray()
-            ).ID;
-            // Corvax-TTS-End
 
             var gender = Gender.Epicene;
 
@@ -391,7 +264,6 @@ namespace Content.Shared.Preferences
                 Age = age,
                 Gender = gender,
                 Species = species,
-                Voice = voiceId, // Corvax-TTS
                 Appearance = HumanoidCharacterAppearance.Random(species, sex),
             };
         }
@@ -406,63 +278,6 @@ namespace Content.Shared.Preferences
             return new(this) { FlavorText = flavorText };
         }
 
-        // Orion-Start
-        public HumanoidCharacterProfile WithOOCFlavorText(string oocFlavorText)
-        {
-            return new(this) { OOCFlavorText = oocFlavorText };
-        }
-
-        public HumanoidCharacterProfile WithCharacterText(string characterFlavorText)
-        {
-            return new(this) { CharacterFlavorText = characterFlavorText };
-        }
-
-        public HumanoidCharacterProfile WithGreenPreferencesText(string greenFlavorText)
-        {
-            return new(this) { GreenFlavorText = greenFlavorText };
-        }
-
-        public HumanoidCharacterProfile WithYellowPreferencesText(string yellowFlavorText)
-        {
-            return new(this) { YellowFlavorText = yellowFlavorText };
-        }
-
-        public HumanoidCharacterProfile WithRedPreferencesText(string redFlavorText)
-        {
-            return new(this) { RedFlavorText = redFlavorText };
-        }
-
-        public HumanoidCharacterProfile WithTagsText(string tagsFlavorText)
-        {
-            return new(this) { TagsFlavorText = tagsFlavorText };
-        }
-
-        public HumanoidCharacterProfile WithLinksText(string linksFlavorText)
-        {
-            return new(this) { LinksFlavorText = linksFlavorText };
-        }
-
-        public HumanoidCharacterProfile WithNSFWPreferencesText(string nsfwFlavorText)
-        {
-            return new(this) { NSFWFlavorText = nsfwFlavorText };
-        }
-        // Orion-End
-        // Erida start
-        public HumanoidCharacterProfile WithNSFWOOCFlavorText(string nsfwOOCFlavorText)
-        {
-            return new(this) { NSFWOOCFlavorText = nsfwOOCFlavorText };
-        }
-
-        public HumanoidCharacterProfile WithNSFWLinksText(string nsfwLinksFlavorText)
-        {
-            return new(this) { NSFWLinksFlavorText = nsfwLinksFlavorText };
-        }
-
-        public HumanoidCharacterProfile WithNSFWTagsText(string nsfwTagsFlavorText)
-        {
-            return new(this) { NSFWTagsFlavorText = nsfwTagsFlavorText };
-        }
-        // Erida end
         public HumanoidCharacterProfile WithAge(int age)
         {
             return new(this) { Age = age };
@@ -483,29 +298,6 @@ namespace Content.Shared.Preferences
             return new(this) { Species = species };
         }
 
-        // Erida-start
-        public HumanoidCharacterProfile WithCustomSpecies(string customspecies)
-        {
-            return new(this) { CustomSpecies = customspecies };
-        }
-
-        public HumanoidCharacterProfile WithHeight(float height)
-        {
-            return new(this) { Height = height };
-        }
-
-        public HumanoidCharacterProfile WithWidth(float width)
-        {
-            return new(this) { Width = width };
-        }
-        // Erida-end
-
-        // Corvax-TTS-Start
-        public HumanoidCharacterProfile WithVoice(string voice)
-        {
-            return new(this) { Voice = voice };
-        }
-        // Corvax-TTS-End
 
         public HumanoidCharacterProfile WithCharacterAppearance(HumanoidCharacterAppearance appearance)
         {
@@ -517,12 +309,6 @@ namespace Content.Shared.Preferences
             return new(this) { SpawnPriority = spawnPriority };
         }
 
-        // Erida start
-        public HumanoidCharacterProfile WithCorporationPreference(CorporationPreference corporationPriority)
-        {
-            return new(this) { Corporation = corporationPriority };
-        }
-        // Erida end
         public HumanoidCharacterProfile WithJobPriorities(IEnumerable<KeyValuePair<ProtoId<JobPrototype>, JobPriority>> jobPriorities)
         {
             var dictionary = new Dictionary<ProtoId<JobPrototype>, JobPriority>(jobPriorities);
@@ -674,42 +460,21 @@ namespace Content.Shared.Preferences
                 ("age", Age)
             );
 
-        public bool MemberwiseEquals(ICharacterProfile maybeOther)
+        public bool MemberwiseEquals(HumanoidCharacterProfile other)
         {
-            if (maybeOther is not HumanoidCharacterProfile other) return false;
             if (Name != other.Name) return false;
-            if (Voice != other.Voice) return false; // Corvax-TTS
             if (Age != other.Age) return false;
             if (Sex != other.Sex) return false;
             if (Gender != other.Gender) return false;
             if (Species != other.Species) return false;
             if (PreferenceUnavailable != other.PreferenceUnavailable) return false;
             if (SpawnPriority != other.SpawnPriority) return false;
-            if (Corporation != other.Corporation) return false; // Erida edit
             if (!_jobPriorities.SequenceEqual(other._jobPriorities)) return false;
             if (!_antagPreferences.SequenceEqual(other._antagPreferences)) return false;
             if (!_traitPreferences.SequenceEqual(other._traitPreferences)) return false;
             if (!Loadouts.SequenceEqual(other.Loadouts)) return false;
             if (FlavorText != other.FlavorText) return false;
-            // Orion-Start
-            if (OOCFlavorText != other.OOCFlavorText) return false;
-            if (CharacterFlavorText != other.CharacterFlavorText) return false;
-            if (GreenFlavorText != other.GreenFlavorText) return false;
-            if (YellowFlavorText != other.YellowFlavorText) return false;
-            if (RedFlavorText != other.RedFlavorText) return false;
-            if (TagsFlavorText != other.TagsFlavorText) return false;
-            if (LinksFlavorText != other.LinksFlavorText) return false;
-            if (NSFWFlavorText != other.NSFWFlavorText) return false;
-            // Orion-End
-            // Erida start
-            if (NSFWOOCFlavorText != other.NSFWOOCFlavorText) return false;
-            if (NSFWLinksFlavorText != other.NSFWLinksFlavorText) return false;
-            if (NSFWTagsFlavorText != other.NSFWTagsFlavorText) return false;
-            if (Width != other.Width) return false;
-            if (Height != other.Height) return false;
-            if (CustomSpecies != other.CustomSpecies) return false;
-            // Erida end
-            return Appearance.MemberwiseEquals(other.Appearance);
+            return Appearance.Equals(other.Appearance);
         }
 
         public void EnsureValid(ICommonSession session, IDependencyCollection collection)
@@ -719,7 +484,7 @@ namespace Content.Shared.Preferences
 
             if (!prototypeManager.TryIndex(Species, out var speciesPrototype) || speciesPrototype.RoundStart == false)
             {
-                Species = SharedHumanoidAppearanceSystem.DefaultSpecies;
+                Species = HumanoidCharacterProfile.DefaultSpecies;
                 speciesPrototype = prototypeManager.Index(Species);
             }
 
@@ -790,144 +555,6 @@ namespace Content.Shared.Preferences
                 flavortext = FormattedMessage.RemoveMarkupOrThrow(FlavorText);
             }
 
-            // Orion-Start
-            string oocflavortext;
-            var oocMaxFlavorTextLength = configManager.GetCVar(CCVars.OOCMaxFlavorTextLength);
-            if (OOCFlavorText.Length > oocMaxFlavorTextLength)
-            {
-                oocflavortext = FormattedMessage.RemoveMarkupOrThrow(OOCFlavorText)[..oocMaxFlavorTextLength];
-            }
-            else
-            {
-                oocflavortext = FormattedMessage.RemoveMarkupOrThrow(OOCFlavorText);
-            }
-
-            string characterDescription;
-            var maxCharacterDescriptionLength = configManager.GetCVar(CCVars.CharacterDescriptionLength);
-            if (CharacterFlavorText.Length > maxCharacterDescriptionLength)
-            {
-                characterDescription = FormattedMessage.RemoveMarkupOrThrow(CharacterFlavorText)[..maxCharacterDescriptionLength];
-            }
-            else
-            {
-                characterDescription = FormattedMessage.RemoveMarkupOrThrow(CharacterFlavorText);
-            }
-
-            string greenPreferences;
-            var maxGreenPreferencesLength = configManager.GetCVar(CCVars.GreenPreferencesLength);
-            if (GreenFlavorText.Length > maxGreenPreferencesLength)
-            {
-                greenPreferences = FormattedMessage.RemoveMarkupOrThrow(GreenFlavorText)[..maxGreenPreferencesLength];
-            }
-            else
-            {
-                greenPreferences = FormattedMessage.RemoveMarkupOrThrow(GreenFlavorText);
-            }
-
-            string yellowPreferences;
-            var maxYellowPreferencesLength = configManager.GetCVar(CCVars.YellowPreferencesLength);
-            if (YellowFlavorText.Length > maxYellowPreferencesLength)
-            {
-                yellowPreferences = FormattedMessage.RemoveMarkupOrThrow(YellowFlavorText)[..maxYellowPreferencesLength];
-            }
-            else
-            {
-                yellowPreferences = FormattedMessage.RemoveMarkupOrThrow(YellowFlavorText);
-            }
-
-            string redPreferences;
-            var maxRedPreferencesLength = configManager.GetCVar(CCVars.RedPreferencesLength);
-            if (RedFlavorText.Length > maxRedPreferencesLength)
-            {
-                redPreferences = FormattedMessage.RemoveMarkupOrThrow(RedFlavorText)[..maxRedPreferencesLength];
-            }
-            else
-            {
-                redPreferences = FormattedMessage.RemoveMarkupOrThrow(RedFlavorText);
-            }
-
-            string tags;
-            var maxTagsLength = configManager.GetCVar(CCVars.TagsLength);
-            if (TagsFlavorText.Length > maxTagsLength)
-            {
-                tags = FormattedMessage.RemoveMarkupOrThrow(TagsFlavorText)[..maxTagsLength];
-            }
-            else
-            {
-                tags = FormattedMessage.RemoveMarkupOrThrow(TagsFlavorText);
-            }
-
-            tags = FormatTags(tags);
-
-            string links;
-            var maxLinksLength = configManager.GetCVar(CCVars.LinksLength);
-            if (LinksFlavorText.Length > maxLinksLength)
-            {
-                links = FormattedMessage.RemoveMarkupOrThrow(LinksFlavorText)[..maxLinksLength];
-            }
-            else
-            {
-                links = FormattedMessage.RemoveMarkupOrThrow(LinksFlavorText);
-            }
-
-            string nsfwPreferences;
-            var maxNSFWPreferencesLength = configManager.GetCVar(CCVars.NSFWPreferencesLength);
-            if (NSFWFlavorText.Length > maxNSFWPreferencesLength)
-            {
-                nsfwPreferences = FormattedMessage.RemoveMarkupOrThrow(NSFWFlavorText)[..maxNSFWPreferencesLength];
-            }
-            else
-            {
-                nsfwPreferences = FormattedMessage.RemoveMarkupOrThrow(NSFWFlavorText);
-            }
-            // Orion-End
-            // Erida start
-            string nsfwoocflavortext;
-            if (NSFWOOCFlavorText.Length > oocMaxFlavorTextLength)
-            {
-                nsfwoocflavortext = FormattedMessage.RemoveMarkupOrThrow(NSFWOOCFlavorText)[..oocMaxFlavorTextLength];
-            }
-            else
-            {
-                nsfwoocflavortext = FormattedMessage.RemoveMarkupOrThrow(NSFWOOCFlavorText);
-            }
-
-            string nsfwlinks;
-            if (NSFWLinksFlavorText.Length > maxLinksLength)
-            {
-                nsfwlinks = FormattedMessage.RemoveMarkupOrThrow(NSFWLinksFlavorText)[..maxLinksLength];
-            }
-            else
-            {
-                nsfwlinks = FormattedMessage.RemoveMarkupOrThrow(NSFWLinksFlavorText);
-            }
-
-            string nsfwtags;
-            if (NSFWTagsFlavorText.Length > maxTagsLength)
-            {
-                nsfwtags = FormattedMessage.RemoveMarkupOrThrow(NSFWTagsFlavorText)[..maxTagsLength];
-            }
-            else
-            {
-                nsfwtags = FormattedMessage.RemoveMarkupOrThrow(NSFWTagsFlavorText);
-            }
-
-            nsfwtags = FormatTags(nsfwtags);
-
-            var customSpeciesMaxLength = configManager.GetCVar(CCVars.MaxCustomSpeciesLength);
-            string customSpecies;
-            if (CustomSpecies.Length > customSpeciesMaxLength)
-            {
-                customSpecies = FormattedMessage.RemoveMarkupOrThrow(CustomSpecies)[..customSpeciesMaxLength];
-            }
-            else
-            {
-                customSpecies = FormattedMessage.RemoveMarkupOrThrow(CustomSpecies);
-            }
-
-            var height = Math.Clamp(Height, 0.8f, 1.2f);
-            var width = Math.Clamp(Width, 0.8f, 1.2f);
-            // Erida end
             var appearance = HumanoidCharacterAppearance.EnsureValid(Appearance, Species, Sex);
 
             var prefsUnavailableMode = PreferenceUnavailable switch
@@ -944,16 +571,6 @@ namespace Content.Shared.Preferences
                 SpawnPriorityPreference.Cryosleep => SpawnPriorityPreference.Cryosleep,
                 _ => SpawnPriorityPreference.None // Invalid enum values.
             };
-
-            // Erida start
-            var corporation = Corporation switch
-            {
-                CorporationPreference.NanoTrasen => CorporationPreference.NanoTrasen,
-                CorporationPreference.Syndicate => CorporationPreference.Syndicate,
-                CorporationPreference.Outsource => CorporationPreference.Outsource,
-                _ => CorporationPreference.Outsource
-            };
-            // Erida end
 
             var priorities = new Dictionary<ProtoId<JobPrototype>, JobPriority>(JobPriorities
                 .Where(p => prototypeManager.TryIndex<JobPrototype>(p.Key, out var job) && job.SetPreference && p.Value switch
@@ -986,30 +603,11 @@ namespace Content.Shared.Preferences
 
             Name = name;
             FlavorText = flavortext;
-            // Orion-Start
-            OOCFlavorText = oocflavortext;
-            CharacterFlavorText = characterDescription;
-            GreenFlavorText = greenPreferences;
-            YellowFlavorText = yellowPreferences;
-            RedFlavorText = redPreferences;
-            TagsFlavorText = tags;
-            LinksFlavorText = links;
-            NSFWFlavorText = nsfwPreferences;
-            // Orion-End
-            // Erida start
-            NSFWOOCFlavorText = nsfwoocflavortext;
-            NSFWLinksFlavorText = nsfwlinks;
-            NSFWTagsFlavorText = nsfwtags;
-            CustomSpecies = customSpecies;
-            Height = height;
-            Width = width;
-            // Erida end
             Age = age;
             Sex = sex;
             Gender = gender;
             Appearance = appearance;
             SpawnPriority = spawnPriority;
-            Corporation = corporation; // Erida edit
 
             _jobPriorities.Clear();
 
@@ -1025,12 +623,6 @@ namespace Content.Shared.Preferences
 
             _traitPreferences.Clear();
             _traitPreferences.UnionWith(GetValidTraits(traits, prototypeManager));
-
-            // Corvax-TTS-Start
-            prototypeManager.TryIndex<TTSVoicePrototype>(Voice, out var voice);
-            if (voice is null || !CanHaveVoice(voice, Sex))
-                Voice = SharedHumanoidAppearanceSystem.DefaultSexVoice[sex];
-            // Corvax-TTS-End
 
             // Checks prototypes exist for all loadouts and dump / set to default if not.
             var toRemove = new ValueList<string>();
@@ -1094,15 +686,7 @@ namespace Content.Shared.Preferences
             return result;
         }
 
-        // Corvax-TTS-Start
-        // SHOULD BE NOT PUBLIC, BUT....
-        public static bool CanHaveVoice(TTSVoicePrototype voice, Sex sex)
-        {
-            return voice.RoundStart && sex == Sex.Unsexed || (voice.Sex == sex || voice.Sex == Sex.Unsexed);
-        }
-        // Corvax-TTS-End
-
-        public ICharacterProfile Validated(ICommonSession session, IDependencyCollection collection)
+        public HumanoidCharacterProfile Validated(ICommonSession session, IDependencyCollection collection)
         {
             var profile = new HumanoidCharacterProfile(this);
             profile.EnsureValid(session, collection);
@@ -1138,29 +722,12 @@ namespace Content.Shared.Preferences
             hashCode.Add(_loadouts);
             hashCode.Add(Name);
             hashCode.Add(FlavorText);
-            // Orion-Start
-            hashCode.Add(OOCFlavorText);
-            hashCode.Add(CharacterFlavorText);
-            hashCode.Add(GreenFlavorText);
-            hashCode.Add(YellowFlavorText);
-            hashCode.Add(RedFlavorText);
-            hashCode.Add(TagsFlavorText);
-            hashCode.Add(LinksFlavorText);
-            hashCode.Add(NSFWFlavorText);
-            // Orion-End
-            // Erida start
-            hashCode.Add(NSFWOOCFlavorText);
-            hashCode.Add(NSFWLinksFlavorText);
-            hashCode.Add(NSFWTagsFlavorText);
-            // Erida end
             hashCode.Add(Species);
-            hashCode.Add(Voice);
             hashCode.Add(Age);
             hashCode.Add((int)Sex);
             hashCode.Add((int)Gender);
             hashCode.Add(Appearance);
             hashCode.Add((int)SpawnPriority);
-            hashCode.Add((int)Corporation); // Erida edit
             hashCode.Add((int)PreferenceUnavailable);
             return hashCode.ToHashCode();
         }
@@ -1201,39 +768,55 @@ namespace Content.Shared.Preferences
             return loadout;
         }
 
-        // Orion-Start
-        private string FormatTags(string inputTags)
-        {
-            if (string.IsNullOrWhiteSpace(inputTags))
-                return string.Empty;
-
-            var rawTags = inputTags.Split(new[] { ',', ' ', '\n', '\r', '\t', ';' }, StringSplitOptions.RemoveEmptyEntries);
-            var formattedTags = new List<string>();
-
-            foreach (var rawTag in rawTags)
-            {
-                var tag = rawTag.Trim();
-                if (string.IsNullOrEmpty(tag))
-                    continue;
-
-                if (!tag.StartsWith("#"))
-                {
-                    tag = "#" + tag;
-                }
-
-                if (tag.Length > 1)
-                {
-                    formattedTags.Add(tag);
-                }
-            }
-
-            return string.Join(", ", formattedTags);
-        }
-        // Orion-End
-
         public HumanoidCharacterProfile Clone()
         {
             return new HumanoidCharacterProfile(this);
+        }
+
+        public DataNode ToDataNode(ISerializationManager? serialization = null, IConfigurationManager? configuration = null)
+        {
+            IoCManager.Resolve(ref serialization);
+            IoCManager.Resolve(ref configuration);
+
+            var export = new HumanoidProfileExportV2()
+            {
+                ForkId = configuration.GetCVar(CVars.BuildForkId),
+                Profile = this,
+            };
+
+            var dataNode = serialization.WriteValue(export, alwaysWrite: true, notNullableOverride: true);
+            return dataNode;
+        }
+
+        public static HumanoidCharacterProfile FromStream(Stream stream, ICommonSession session, ISerializationManager? serialization = null, IConfigurationManager? configuration = null)
+        {
+            IoCManager.Resolve(ref serialization);
+            IoCManager.Resolve(ref configuration);
+
+            using var reader = new StreamReader(stream, EncodingHelpers.UTF8);
+            var yamlStream = new YamlStream();
+            yamlStream.Load(reader);
+
+            var root = yamlStream.Documents[0].RootNode;
+            HumanoidCharacterProfile profile;
+            if (root["version"].Equals(new YamlScalarNode("1")))
+            {
+                var export = serialization.Read<HumanoidProfileExportV1>(root.ToDataNode(), notNullableOverride: true);
+                profile = export.ToV2().Profile;
+            }
+            else if (root["version"].Equals(new YamlScalarNode("2")))
+            {
+                var export = serialization.Read<HumanoidProfileExportV2>(root.ToDataNode(), notNullableOverride: true);
+                profile = export.Profile;
+            }
+            else
+            {
+                throw new InvalidOperationException($"Unknown version {root["version"]}");
+            }
+
+            var collection = IoCManager.Instance;
+            profile.EnsureValid(session, collection!);
+            return profile;
         }
     }
 }

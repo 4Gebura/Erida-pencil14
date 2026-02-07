@@ -60,8 +60,6 @@ namespace Content.Server.Voting.Managers
         /// <returns>A handle to the created vote.</returns>
         IVoteHandle CreateVote(VoteOptions options);
 
-        void DecreaseMapCooldowns(); // Erida
-
         void Initialize();
         void Update();
     }

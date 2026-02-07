@@ -12,7 +12,6 @@
   recipes:
   - OreProcessorMachineCircuitboard
   - SalvageMagnetMachineCircuitboard
-  - SalvageExpeditionsComputerCircuitboard
 
 ## Dynamic
 
@@ -24,7 +23,6 @@
   - MineralScannerEmpty
   - AdvancedMineralScannerEmpty
   - OreBagOfHolding
-  - WeaponGrapplingGun # Backmen
 
 - type: latheRecipePack
   id: CargoBoards

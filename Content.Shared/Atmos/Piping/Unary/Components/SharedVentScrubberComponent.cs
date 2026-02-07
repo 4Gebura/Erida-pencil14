@@ -23,16 +23,7 @@ namespace Content.Shared.Atmos.Piping.Unary.Components
             Gas.WaterVapor,
             Gas.Ammonia,
             Gas.NitrousOxide,
-            Gas.Frezon,
-            //ADT-Gases-Start
-            Gas.Pluoxium,
-            Gas.Hydrogen,
-            Gas.BZ,
-            Gas.Healium,
-            Gas.Nitrium,
-            Gas.HyperNoblium,
-            Gas.Zauker
-            //ADT-Gases-End
+            Gas.Frezon
         };
 
         // Presets for 'dumb' air alarm modes

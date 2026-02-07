@@ -4,7 +4,6 @@ using Content.Shared.Research.Systems;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.List;
 
 namespace Content.Shared.Research.Components;
 
@@ -44,13 +43,6 @@ public sealed partial class TechnologyDatabaseComponent : Component
     [AutoNetworkedField]
     [DataField]
     public List<ProtoId<LatheRecipePrototype>> UnlockedRecipes = new();
-
-    /// <summary>
-    /// Backmen change: technologies that are researched rounstart.
-    /// </summary>
-    [AutoNetworkedField]
-    [DataField("roundstartTechs", customTypeSerializer: typeof(PrototypeIdListSerializer<TechnologyPrototype>))]
-    public List<string> RoundstartTechnologies = new();
 }
 
 /// <summary>

@@ -1,17 +1,11 @@
-using Content.Shared.Backmen.Language;
 using Content.Shared.Chat;
 using Content.Shared.Radio;
 
 namespace Content.Server.Radio;
 
 [ByRefEvent]
-public readonly record struct RadioReceiveEvent(string Message, EntityUid MessageSource, RadioChannelPrototype Channel, EntityUid RadioSource, MsgChatMessage ChatMsg)
-{
-    // start-backmen: language
-    public MsgChatMessage? LanguageObfuscatedChatMsg { init; get; }
-    public LanguagePrototype? Language { init; get; }
-    // end-backmen: language
-};
+public readonly record struct RadioReceiveEvent(string Message, EntityUid MessageSource, RadioChannelPrototype Channel, EntityUid RadioSource, MsgChatMessage ChatMsg);
+
 /// <summary>
 /// Event raised on the parent entity of a headset radio when a radio message is received
 /// </summary>

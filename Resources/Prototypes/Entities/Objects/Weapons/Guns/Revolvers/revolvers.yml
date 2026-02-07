@@ -5,17 +5,6 @@
   description: A rooty tooty point and shooty.
   abstract: true
   components:
-  # handling sounds edit start
-  - type: EmitSoundOnPickup
-    sound:
-      collection: RevolversPickUp
-  - type: EmitSoundOnDrop
-    sound:
-      collection: RevolversDrop
-  - type: EmitSoundOnLand
-    sound:
-      collection: RevolversDrop
-  # handling sounds edit end
   - type: Sprite
     state: icon
   - type: Item
@@ -61,11 +50,6 @@
       path: /Audio/Weapons/Guns/MagIn/revolver_magin.ogg
   - type: StaticPrice
     price: 500
-  # Erida-start
-  - type: DualWeaponsBonus
-    minAngle: 30
-    maxAngle: 30
-  # Erida-end
 
 - type: entity
   name: Deckard

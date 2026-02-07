@@ -8,123 +8,67 @@
 - type: radioChannel
   id: CentCom
   name: chat-radio-centcom
-  keycode: 'ц'
+  keycode: 'y'
   frequency: 1337
   color: "#2681a5"
   longRange: true
-  # radio channels sounds edit start
-  onSendSound:
-    path: /Audio/_Erida/Radio/cc.ogg
-    params:
-      volume: -6
-      maxDistance: 2
-  # radio channels sounds edit end
 
 - type: radioChannel
   id: Command
   name: chat-radio-command
-  keycode: 'к'
+  keycode: 'c'
   frequency: 1353
   color: "#fcdf03"
-  # radio channels sounds edit start
-  onSendSound:
-    path: /Audio/_Erida/Radio/command.ogg
-    params:
-      volume: -6
-      maxDistance: 2
-  # radio channels sounds edit end
 
 - type: radioChannel
   id: Engineering
   name: chat-radio-engineering
-  keycode: 'и'
+  keycode: 'e'
   frequency: 1357
   color: "#ff733c"
-  # radio channels sounds edit start
-  onSendSound:
-    path: /Audio/_Erida/Radio/eng.ogg
-    params:
-      volume: -6
-      maxDistance: 2
-  # radio channels sounds edit end
 
 - type: radioChannel
   id: Medical
   name: chat-radio-medical
-  keycode: 'м'
+  keycode: 'm'
   frequency: 1355
   color: "#57b8f0"
-  # radio channels sounds edit start
-  onSendSound:
-    path: /Audio/_Erida/Radio/med.ogg
-    params:
-      volume: -6
-      maxDistance: 2
-  # radio channels sounds edit end
 
 - type: radioChannel
   id: Science
   name: chat-radio-science
-  keycode: 'н'
+  keycode: 'n'
   frequency: 1351
   color: "#cd7ccd"
-  # radio channels sounds edit start
-  onSendSound:
-    path: /Audio/_Erida/Radio/science.ogg
-    params:
-      volume: -6
-      maxDistance: 2
-  # radio channels sounds edit end
 
 - type: radioChannel
   id: Security
   name: chat-radio-security
-  keycode: 'о'
+  keycode: 's'
   frequency: 1359
   color: "#ff4242"
-  # radio channels sounds edit start
-  onSendSound:
-    path: /Audio/_Erida/Radio/security.ogg
-    params:
-      volume: -6
-      maxDistance: 2
-  # radio channels sounds edit end
 
 - type: radioChannel
   id: Service
   name: chat-radio-service
-  keycode: 'с'
+  keycode: 'v'
   frequency: 1349
   color: "#539c00"
 
 - type: radioChannel
   id: Supply
   name: chat-radio-supply
-  keycode: 'п'
+  keycode: 'u'
   frequency: 1347
   color: "#b48b57"
-  # radio channels sounds edit start
-  onSendSound:
-    path: /Audio/_Erida/Radio/cargo.ogg
-    params:
-      volume: -6
-      maxDistance: 2
-  # radio channels sounds edit end
 
 - type: radioChannel
   id: Syndicate
   name: chat-radio-syndicate
-  keycode: 'т'
+  keycode: 't'
   frequency: 1213
   color: "#8f4a4b"
   longRange: true
-  # radio channels sounds edit start
-  onSendSound:
-    path: /Audio/_Erida/Radio/security.ogg
-    params:
-      volume: -6
-      maxDistance: 2
-  # radio channels sounds edit end
 
 - type: radioChannel
   id: Handheld
@@ -133,18 +77,11 @@
   color: "#967101"
   # long range since otherwise it'd defeat the point of a handheld radio independent of telecomms
   longRange: true
-  # radio channels sounds edit start
-  onSendSound:
-    path: /Audio/_Erida/Radio/handheld.ogg
-    params:
-      volume: -6
-      maxDistance: 2
-  # radio channels sounds edit end
 
 - type: radioChannel
   id: Binary
   name: chat-radio-binary
-  keycode: 'д'
+  keycode: 'b'
   frequency: 1001
   color: "#5ed7aa"
   # long range since otherwise it'd defeat the point of a handheld radio independent of telecomms
@@ -153,7 +90,7 @@
 - type: radioChannel
   id: Freelance
   name: chat-radio-freelance
-  keycode: 'ф'
+  keycode: 'f'
   frequency: 1984
   color: "#f6ce64"
   # long range since otherwise it'd defeat the point of a handheld radio independent of telecomms
@@ -176,10 +113,3 @@
   color: "#ff2222"
   # long range since I don't wanna make a special xenoborg telecomm server
   longRange: true
-
-- type: radioChannel
-  id: Law
-  name: chat-radio-law
-  keycode: 'ю' 
-  frequency: 2789
-  color: "#d98b71"

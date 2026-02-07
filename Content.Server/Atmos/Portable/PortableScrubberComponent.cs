@@ -29,16 +29,7 @@ namespace Content.Server.Atmos.Portable
             Gas.WaterVapor,
             Gas.Ammonia,
             Gas.NitrousOxide,
-            Gas.Frezon,
-            //ADT-Gas-Start
-            Gas.Pluoxium,
-            Gas.Hydrogen,
-            Gas.BZ,
-            Gas.Healium,
-            Gas.Nitrium,
-            Gas.HyperNoblium,
-            Gas.Zauker
-            //ADT-Gas-End
+            Gas.Frezon
         };
 
         [ViewVariables(VVAccess.ReadWrite)]

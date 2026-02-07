@@ -5,14 +5,6 @@
   name: crowbar
   description: A multipurpose tool used for many tasks, such as prying doors or bludgeoning interdimensional invaders.
   components:
-  # handling sounds edit start
-  - type: EmitSoundOnPickup
-    sound:
-      path: /Audio/_Erida/Items/handling/crowbar_pickup.ogg
-  - type: EmitSoundOnDrop
-    sound:
-      path: /Audio/Items/crowbar_drop.ogg
-  # handling sounds edit end
   - type: EmitSoundOnLand
     sound:
       path: /Audio/Items/crowbar_drop.ogg
@@ -47,9 +39,7 @@
     - Belt
   - type: Item
     sprite: Objects/Tools/crowbar.rsi
-    size: Normal
-    shape:
-    - 0,0,0,1
+    size: Small
 
 # Standard (grey) Crowbar
 - type: entity

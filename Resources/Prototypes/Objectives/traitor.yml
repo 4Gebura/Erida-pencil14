@@ -37,7 +37,7 @@
 - type: entity
   parent: [BaseTraitorObjective, BaseLivingObjective]
   id: EscapeShuttleObjective
-  name: Escape to centcomm alive and unrestrained.
+  name: Escape to CentComm alive and unrestrained via the escape shuttle.
   description: One of our undercover agents will debrief you when you arrive. Don't show up in cuffs.
   components:
   - type: Objective
@@ -197,9 +197,6 @@
     jobs: [ ChiefMedicalOfficer ]
   - type: StealCondition
     owner: job-name-cmo
-  - type: NoOwnerRequirement
-    job:
-    - ChiefMedicalOfficer
 
 - type: entity
   parent: BaseCMOStealObjective
@@ -226,9 +223,6 @@
     jobs: [ ResearchDirector ]
   - type: StealCondition
     owner: job-name-rd
-  - type: NoOwnerRequirement
-    job:
-    - ResearchDirector
 
 - type: entity
   parent: BaseRDStealObjective
@@ -261,9 +255,6 @@
   - type: StealCondition
     stealGroup: WeaponEnergyMagnum
     owner: job-name-hos
-  - type: NoOwnerRequirement
-    job:
-    - HeadOfSecurity
 
 ## ce
 
@@ -276,9 +267,6 @@
   - type: StealCondition
     stealGroup: ClothingShoesBootsMagAdv
     owner: job-name-ce
-  - type: NoOwnerRequirement
-    job:
-    - ChiefEngineer
 
 ## qm
 
@@ -291,9 +279,6 @@
   - type: StealCondition
     stealGroup: BoxFolderQmClipboard
     owner: job-name-qm
-  - type: NoOwnerRequirement
-    job:
-    - Quartermaster
 
 - type: entity
   parent: BaseTraitorStealObjective
@@ -304,9 +289,6 @@
   - type: StealCondition
     stealGroup: ClothingHandsKnuckleDustersQM
     owner: job-name-qm
-  - type: NoOwnerRequirement
-    job:
-    - Quartermaster
 
 ## hop
 
@@ -321,9 +303,6 @@
   - type: StealCondition
     stealGroup: FoodMeatCorgi
     owner: objective-condition-steal-Ian
-  - type: NoOwnerRequirement
-    job:
-    - HeadOfPersonnel
 
 ## cap
 

@@ -3,17 +3,6 @@
   parent: Clothing
   id: UnsensoredClothingUniformBase
   components:
-  # handling sounds edit start
-  - type: EmitSoundOnPickup
-    sound:
-      path: /Audio/_Erida/Items/handling/cloth_pickup.ogg
-  - type: EmitSoundOnDrop
-    sound:
-      path: /Audio/_Erida/Items/handling/cloth_drop.ogg
-  - type: EmitSoundOnLand
-    sound:
-      path: /Audio/_Erida/Items/handling/cloth_drop.ogg
-  # handling sounds edit end
   - type: Sprite
     state: icon
   - type: Clothing
@@ -42,8 +31,6 @@
     - ClothMade
     - Recyclable
     - WhitelistChameleon
-  - type: SlotBlock
-    blockList: [ UNDERSHIRT, UNDERPANTS, SOCKS, UNDERWEAR ]
 
 - type: entity
   abstract: true
@@ -53,9 +40,7 @@
   - type: Clothing
     slots: [innerclothing]
     femaleMask: UniformTop
-  - type: SlotBlock
-    blockList: [ UNDERSHIRT ]
-    hideList: [ UNDERPANTS, UNDERWEAR ]
+
 
 - type: entity
   abstract: true
@@ -70,8 +55,6 @@
   - type: WirelessNetworkConnection
     range: 1200
   - type: StationLimitedNetwork
-  - type: SlotBlock
-    blockList: [ UNDERSHIRT, UNDERPANTS, SOCKS, UNDERWEAR ]
 
 - type: entity
   abstract: true
@@ -81,9 +64,6 @@
   - type: Clothing
     slots: [innerclothing]
     femaleMask: UniformTop
-  - type: SlotBlock
-    blockList: [ UNDERSHIRT ]
-    hideList: [ UNDERPANTS, UNDERWEAR ]
 
 - type: entity
   abstract: true

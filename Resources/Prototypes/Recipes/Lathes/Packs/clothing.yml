@@ -6,12 +6,7 @@
   - ClothingUniformJumpsuitColorGrey
   - ClothingUniformJumpskirtColorGrey
   - ClothingUniformJumpsuitLoungewear
-  #Erida-start
-  - ClothingUniformJumpsuitmaidblack
-  - ClothingUniformJumpsuitmaidblue
-  - ClothingUniformJumpsuitmaidpink
-  #Erida-End
-  
+
 - type: latheRecipePack
   id: ClothingCargo
   recipes:

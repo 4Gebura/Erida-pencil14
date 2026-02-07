@@ -1,4 +1,3 @@
-/* // Orion-Remove | Replaced
 using Content.Shared.Examine;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Verbs;
@@ -44,4 +43,3 @@ public sealed class DetailExaminableSystem : EntitySystem
         args.Verbs.Add(verb);
     }
 }
-*/

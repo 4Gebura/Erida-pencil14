@@ -16,11 +16,7 @@
     PaperCNCSheet: 6
     MysteryFigureBox: 2
     BooksBag: 3
-    # Erida-start
-    CardBoxSyndicate: 2
-    CardBoxNanotrasen: 2
-    CardBoxBlack: 2
-    # Erida-end
+    Magic9Ball: 2
   contrabandInventory:
     Basketball: 1
     FoodSnackBoritos: 3

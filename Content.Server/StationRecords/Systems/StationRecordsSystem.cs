@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Content.Server.Access.Systems;
-using Content.Shared._Erida.Preference; // Erida edit
+using Content.Server.Forensics;
 using Content.Shared.Access.Components;
 using Content.Shared.Forensics.Components;
 using Content.Shared.GameTicking;
@@ -97,7 +97,7 @@ public sealed class StationRecordsSystem : SharedStationRecordsSystem
         TryComp<FingerprintComponent>(player, out var fingerprintComponent);
         TryComp<DnaComponent>(player, out var dnaComponent);
 
-        CreateGeneralRecord(station, idUid.Value, profile.Name, profile.Age, profile.Species, profile.CustomSpecies, profile.Gender, profile.Corporation, jobId, fingerprintComponent?.Fingerprint, dnaComponent?.DNA, profile, records); // Erida
+        CreateGeneralRecord(station, idUid.Value, profile.Name, profile.Age, profile.Species, profile.Gender, jobId, fingerprintComponent?.Fingerprint, dnaComponent?.DNA, profile, records);
     }
 
 
@@ -134,9 +134,7 @@ public sealed class StationRecordsSystem : SharedStationRecordsSystem
         string name,
         int age,
         string species,
-        string customspecies, // Erida
         Gender gender,
-        CorporationPreference corporation, // Erida
         string jobId,
         string? mobFingerprint,
         string? dna,
@@ -162,9 +160,7 @@ public sealed class StationRecordsSystem : SharedStationRecordsSystem
             JobIcon = jobPrototype.Icon,
             JobPrototype = jobId,
             Species = species,
-            CustomSpecies = customspecies, // Erida
             Gender = gender,
-            Corporation = corporation, // Erida edit
             DisplayPriority = jobPrototype.RealDisplayWeight,
             Fingerprint = mobFingerprint,
             DNA = dna
@@ -345,7 +341,7 @@ public sealed class StationRecordsSystem : SharedStationRecordsSystem
             StationRecordFilterType.Job =>
                 !someRecord.JobTitle.ToLower().Contains(filterLowerCaseValue),
             StationRecordFilterType.Species =>
-                !someRecord.CustomSpecies.ToLower().Contains(filterLowerCaseValue), // Erida
+                !someRecord.Species.ToLower().Contains(filterLowerCaseValue),
             StationRecordFilterType.Prints => someRecord.Fingerprint != null
                 && IsFilterWithSomeCodeValue(someRecord.Fingerprint, filterLowerCaseValue),
             StationRecordFilterType.DNA => someRecord.DNA != null

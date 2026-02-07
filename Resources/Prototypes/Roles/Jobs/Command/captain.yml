@@ -19,10 +19,6 @@
     - !type:DepartmentTimeRequirement
       department: Command
       time: 4h
-    # Erida start
-    - !type:AgeRequirement
-      requiredAge: 21
-    # Erida end
   weight: 20
   startingGear: CaptainGear
   icon: "JobIconCaptain"

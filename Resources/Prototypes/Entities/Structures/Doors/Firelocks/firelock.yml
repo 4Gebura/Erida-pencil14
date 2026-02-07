@@ -1,7 +1,7 @@
 - type: entity
   id: BaseFirelock
   abstract: true
-  parent: [BaseStructure, BaseDeltaPressureBasic] # Erida
+  parent: BaseStructure
   name: firelock
   description: Apply crowbar.
   components:

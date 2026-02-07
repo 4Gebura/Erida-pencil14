@@ -167,7 +167,7 @@
     children:
     - id: SpaceCash100
       weight: 2
-    - id: GlowstickBase
+    - id: GlowstickGreen
       amount: !type:RangeNumberSelector
         range: 1, 5
     - id: GlowstickRed
@@ -448,7 +448,7 @@
     children:
     - id: SpaceCash100
       weight: 50
-    - id: TelecrystalOrange1 # Erida-edit
+    - id: Telecrystal1
       amount: !type:RangeNumberSelector
         range: 1, 3
     - id: GatfruitSeeds

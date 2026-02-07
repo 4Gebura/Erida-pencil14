@@ -1,6 +1,6 @@
 - type: entity
   abstract: true
-  parent: [ BaseItem, StorePresetUplinkInteQ ] #PDA's have uplinks so they have to inherit the data.
+  parent: [ BaseItem, StorePresetUplink ] #PDA's have uplinks so they have to inherit the data.
   id: BasePDA
   name: PDA
   description: Personal Data Assistant.
@@ -123,13 +123,6 @@
     proto: robot
   - type: Speech
     speechVerb: Robotic
-  - type: LanguageSpeaker
-    currentLanguage: TauCetiBasic
-  - type: LanguageKnowledge #backmen: languages
-    speaks:
-    - TauCetiBasic
-    understands:
-    - TauCetiBasic
 
 - type: entity
   parent: BasePDA
@@ -422,6 +415,9 @@
       whitelist:
         components:
         - Cartridge
+    preinstalled:
+    - CrewManifestCartridge
+    - NewsReaderCartridge
   - type: Appearance
     appearanceDataInit:
      enum.PdaVisuals.PdaType:
@@ -1242,13 +1238,6 @@
   name: CBURN PDA
   description: Smells like rotten flesh.
   components:
-  - type: Appearance
-    appearanceDataInit:
-     enum.PdaVisuals.PdaType:
-       !type:String
-       pda-cburn
-  - type: Icon
-    state: pda-cburn
   - type: Pda
     id: CBURNIDcard
   - type: PdaBorderColor
@@ -1515,6 +1504,22 @@
     state: pda-seniorcourier
 
 - type: entity
+  parent: [ BaseHighlyIllegalContraband, BasePDA ]
+  id: NinjaPDA
+  name: ninja PDA
+  description: You stealthy bastard, you!
+  components:
+  - type: Pda
+    id: NinjaIDCard
+  - type: Appearance
+    appearanceDataInit:
+      enum.PdaVisuals.PdaType:
+        !type:String
+        pda-ninja
+  - type: Icon
+    state: pda-ninja
+
+- type: entity
   parent: [ BaseMajorContraband, SyndiPDA ]
   id: PiratePDA
   name: pirate PDA
@@ -1562,6 +1567,14 @@
         type: ChameleonBoundUserInterface
 
 - type: entity
+  parent: ChameleonPDA
+  id: ChameleonAgentPDA
+  suffix: Chameleon, Agent ID
+  components:
+  - type: Pda
+    id: AgentIDCard
+
+- type: entity
   parent: BaseWidePDA
   id: WizardPDA
   name: wizard PDA
@@ -1595,40 +1608,3 @@
   - type: Tag #  Ignore Chameleon tags
     tags:
     - DoorBumpOpener
-
-- type: entity
-  parent: BasePDA
-  id: IAAPDA
-  name: internal affairs agent PDA
-  description: Corporation and profit are best friends.
-  components:
-    - type: Appearance
-      appearanceDataInit:
-        enum.PdaVisuals.PdaType:
-          !type:String
-          pda-lawyer
-    - type: Pda
-      id: IAAIDCard
-    - type: PdaBorderColor
-      borderColor: "#6f6192"
-    - type: Icon
-      state: pda-lawyer
-
-- type: entity
-  parent: BasePDA
-  id: PilotPDA
-  name: pilot PDA
-  description: Нas protection from cosmic radiation.
-  components:
-    - type: Appearance
-      appearanceDataInit:
-        enum.PdaVisuals.PdaType:
-          !type:String
-          pda-seniorofficer
-    - type: Pda
-      id: PilotIDCard
-    - type: PdaBorderColor
-      borderColor: "#A32D26"
-      accentVColor: "#DFDFDF"
-    - type: Icon
-      state: pda-seniorofficer

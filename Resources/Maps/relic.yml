@@ -4966,9 +4966,10 @@ entities:
       parent: 2
     - type: TechnologyDatabase
       supportedDisciplines:
-      - Engineering
-      - Scientific
-      - Service
+      - Industrial
+      - Arsenal
+      - Experimental
+      - CivilianServices
   - uid: 7795
     components:
     - type: Transform
@@ -4976,9 +4977,10 @@ entities:
       parent: 2
     - type: TechnologyDatabase
       supportedDisciplines:
-      - Engineering
-      - Scientific
-      - Service
+      - Industrial
+      - Arsenal
+      - Experimental
+      - CivilianServices
   - uid: 8478
     components:
     - type: Transform
@@ -4986,9 +4988,10 @@ entities:
       parent: 2
     - type: TechnologyDatabase
       supportedDisciplines:
-      - Engineering
-      - Scientific
-      - Service
+      - Industrial
+      - Arsenal
+      - Experimental
+      - CivilianServices
 - proto: BackgammonBoard
   entities:
   - uid: 10306
@@ -20563,11 +20566,10 @@ entities:
       parent: 2
     - type: TechnologyDatabase
       supportedDisciplines:
-      - Engineering
+      - Industrial
       - Arsenal
-      - Security
-      - Scientific
-      - Service
+      - Experimental
+      - CivilianServices
 - proto: ClosetEmergencyFilledRandom
   entities:
   - uid: 1020
@@ -22434,10 +22436,10 @@ entities:
       parent: 2
     - type: TechnologyDatabase
       supportedDisciplines:
-      - Engineering
+      - Industrial
       - Arsenal
-      - Scientific
-      - Service
+      - Experimental
+      - CivilianServices
 - proto: ComputerShuttleCargo
   entities:
   - uid: 1070
@@ -50343,10 +50345,10 @@ entities:
       parent: 2
     - type: TechnologyDatabase
       supportedDisciplines:
-      - Engineering
+      - Industrial
       - Arsenal
-      - Scientific
-      - Service
+      - Experimental
+      - CivilianServices
 - proto: MedkitBruteFilled
   entities:
   - uid: 6464
@@ -51192,7 +51194,7 @@ entities:
 
         [bold]Sentencing Phase:[/bold]
 
-        If the death penalty was sought (you MUST have gone through a trial for death penalty) then skip to the second part.
+        If the death penalty was sought (you MUST have gone through a trial for death penalty) then skip to the second part. 
 
         I. Each side can present more evidence/witnesses in any order. There is NO ban on emotional aspects or anything. The prosecution is to submit a suggested penalty. After all the sides are done then the judicial authority is to give a sentence.
 
@@ -53862,10 +53864,10 @@ entities:
       parent: 2
     - type: TechnologyDatabase
       supportedDisciplines:
-      - Engineering
+      - Industrial
       - Arsenal
-      - Scientific
-      - Service
+      - Experimental
+      - CivilianServices
   - uid: 8479
     components:
     - type: Transform
@@ -53873,10 +53875,10 @@ entities:
       parent: 2
     - type: TechnologyDatabase
       supportedDisciplines:
-      - Engineering
+      - Industrial
       - Arsenal
-      - Scientific
-      - Service
+      - Experimental
+      - CivilianServices
 - proto: ProximitySensor
   entities:
   - uid: 828
@@ -63281,10 +63283,10 @@ entities:
       parent: 2
     - type: TechnologyDatabase
       supportedDisciplines:
-      - Engineering
+      - Industrial
       - Arsenal
-      - Scientific
-      - Service
+      - Experimental
+      - CivilianServices
 - proto: VendingMachineCart
   entities:
   - uid: 7787

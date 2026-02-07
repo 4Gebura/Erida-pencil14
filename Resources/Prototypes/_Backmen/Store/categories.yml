@@ -1,7 +1,0 @@
-- type: storeCategory
-  id: BoxingDrobeInventory
-  name: store-category-vendingmachineboxingdrobe
-
-- type: storeCategory
-  id: BoxingDrobeInventoryEmag
-  name: store-category-emag

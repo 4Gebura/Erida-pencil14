@@ -143,5 +143,3 @@
   components:
   - type: Sprite
     sprite: Structures/Doors/Airlocks/Standard/shuttle_xenoborg.rsi
-  - type: Airlock
-    openUnlitVisible: false # Erida

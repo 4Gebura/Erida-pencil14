@@ -1,7 +1,7 @@
 - type: entity
   name: rat king
   id: MobRatKing
-  parent: [ SimpleMobBase, MobCombat ]
+  parent: [ BaseMobRat, SimpleMobBase, MobCombat ]
   description: He's da rat. He make da roolz.
   components:
   - type: CombatMode
@@ -59,9 +59,6 @@
       types:
         Slash: 12
         Piercing: 8
-  - type: Body
-    prototype: Rat
-    requiredLegs: 0 # TODO: Make more than 1 leg, set to 0 to avoid sprint speed being reset by the body system
   - type: Hunger # probably should be prototyped
     thresholds:
       Overfed: 200
@@ -102,11 +99,11 @@
       - CannotSuicide
       - FootstepSound
   - type: NoSlip
+  - type: Insulated
+    coefficient: 0.5 # rat king touches more wires, see?
   - type: Rummager
   - type: RatKing
-    # Erida-start
-    hungerPerArmyUse: 50 # 25
-    # Erida-end
+    hungerPerArmyUse: 25
     hungerPerDomainUse: 50
   - type: MobsterAccent
   - type: Speech
@@ -129,8 +126,6 @@
     attributes:
       gender: male
   - type: Sharp
-  - type: TTS # Corvax-TTS
-    voice: Monolith2
 
 - type: entity
   id: MobRatKingBuff
@@ -172,16 +167,14 @@
 - type: entity
   name: rat servant
   id: MobRatServant
-  parent: [ SimpleMobBase, MobCombat ]
+  parent: [ BaseMobRat, SimpleMobBase, MobCombat ]
   description: He's da mini rat. He don't make da roolz.
   categories: [ HideSpawnMenu ] #Must be configured to a King or the AI breaks.
   components:
   - type: CombatMode
   - type: MovementSpeedModifier
-    # Erida-start
-    baseWalkSpeed : 5.00 # 3.5
-    baseSprintSpeed : 5.00 # 3.5
-    # Erida-end
+    baseWalkSpeed : 3.5
+    baseSprintSpeed : 3.5
   - type: InputMover
   - type: MobMover
   - type: HTN
@@ -235,10 +228,8 @@
   - type: MobThresholds
     thresholds:
       0: Alive
-      # Erida-start
-      30: Critical # 15
-      60: Dead # 30
-      # Erida-end
+      15: Critical
+      30: Dead
   - type: Destructible
     thresholds:
     - trigger:
@@ -249,7 +240,7 @@
       - !type:GibBehavior
         recursive: false
   - type: Stamina
-    critThreshold: 60
+    baseCritThreshold: 60
   - type: MeleeWeapon
     soundHit:
         path: /Audio/Weapons/bladeslice.ogg
@@ -257,13 +248,8 @@
     animation: WeaponArcClaw
     damage:
       types:
-        # Erida-start
-        Slash: 10 # 5
-        Piercing: 6 # 3
-        # Erida-end
-  - type: Body
-    prototype: Rat
-    requiredLegs: 0 # TODO: Make more than 1 leg, set to 0 to avoid sprint speed being reset by the body system
+        Slash: 5
+        Piercing: 3
   - type: Hunger # probably should be prototyped
     thresholds:
       Overfed: 200
@@ -304,6 +290,8 @@
       - CannotSuicide
       - FootstepSound
   - type: NoSlip
+  - type: Insulated
+    coefficient: 0.2 # they don't make da roolz, but they sneaky
   - type: MobPrice
     price: 500 # rat wealth
   - type: MobsterAccent
@@ -335,9 +323,7 @@
   description: Spend some hunger to summon an allied rat to help defend you.
   components:
   - type: Action
-    # Erida-start
-    useDelay: 8 # 4
-    # Erida-end
+    useDelay: 4
     icon:
       sprite: Interface/Actions/actions_rat_king.rsi
       state: ratKingArmy
