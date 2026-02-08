@@ -1,0 +1,6 @@
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconInteQ
+  icon:
+    sprite: /Textures/_Erida/Interface/Misc/job_icons.rsi
+    state: InteQ
