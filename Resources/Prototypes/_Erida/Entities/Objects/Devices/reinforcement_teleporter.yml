@@ -6,7 +6,7 @@
   description: Call in a InteQ agent of questionable quality, instantly! Only basic equipment provided.
   components:
   - type: Sprite
-    sprite: _Orion/Objects/Devices/inteq_uplink.rsi
+    sprite: _Erida/Objects/Devices/inteq_uplink.rsi
     layers:
     - state: inteq-uplink
 

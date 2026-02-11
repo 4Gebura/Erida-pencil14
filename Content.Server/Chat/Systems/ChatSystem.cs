@@ -289,7 +289,7 @@ public sealed partial class ChatSystem : SharedChatSystem
             return;
 
 
-        message = SanitizeInGameOOCMessage(message, player); // Orion-Edit | player
+        message = SanitizeInGameOOCMessage(message, player); // Erida-Edit | player
 
         var sendType = type;
         // If dead player LOOC is disabled, unless you are an admin with Moderator perms, send dead messages to dead chat
@@ -894,7 +894,7 @@ private void SendEntityWhisper(
         return prefix + newMessage;
     }
 
-    private string SanitizeInGameOOCMessage(string message, ICommonSession? session) // Orion-Edit | ICommonSession
+    private string SanitizeInGameOOCMessage(string message, ICommonSession? session) // Erida-Edit | ICommonSession
     {
         var newMessage = message.Trim();
         newMessage = FormattedMessage.EscapeText(newMessage);
