@@ -1,0 +1,2 @@
+<#-- Auto generated file -->
+defibrillator-unrevivable = Этот пациент не может быть оживлён из-за уникального телосложения.

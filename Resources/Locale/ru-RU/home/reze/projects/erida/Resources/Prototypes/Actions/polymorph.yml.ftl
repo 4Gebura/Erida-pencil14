@@ -1,0 +1,2 @@
+<#-- Auto generated file -->
+revert-polymorph-action-popup = Это действие необратимо. Для подтверждения, выполните его ещё раз.

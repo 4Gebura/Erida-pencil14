@@ -1,0 +1,6 @@
+<#-- Auto generated file -->
+deployable-turret-component-activating = Развёртывание...
+
+deployable-turret-component-deactivating = Сворачивание...
+
+deployable-turret-component-activate = Активировать

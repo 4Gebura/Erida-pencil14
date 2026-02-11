@@ -1,0 +1,2 @@
+<#-- Auto generated file -->
+gas-pressure-pump-system-examined = Насос настроен на [color={statusColor}]{PRESSURE}[/color].

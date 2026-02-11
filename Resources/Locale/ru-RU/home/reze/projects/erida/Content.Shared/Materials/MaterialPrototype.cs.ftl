@@ -1,0 +1,22 @@
+<#-- Auto generated file -->
+materials-unit-sheet = листы
+
+materials-unit-bar = слитки
+
+materials-unit-plank = доски
+
+materials-unit-roll = рулоны
+
+materials-unit-piece = единицы
+
+materials-unit-bunch = единицы
+
+materials-unit-slab = куски
+
+materials-unit-web = пряди
+
+materials-unit-chunk = куски руды
+
+materials-unit-boll = шарики
+
+materials-unit-bill = банкноты
