@@ -1,7 +1,6 @@
 - type: marking
   id: TailAxolotl
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Reptilian]
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi
@@ -10,7 +9,6 @@
 - type: marking
   id: TailDatashark
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Reptilian]
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi
@@ -27,7 +25,6 @@
 - type: marking
   id: TailEasternDragon
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Reptilian]
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi
@@ -38,7 +35,6 @@
 - type: marking
   id: TailFennec
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi
@@ -47,7 +43,6 @@
 - type: marking
   id: TailFish
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Reptilian]
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi
@@ -58,7 +53,6 @@
 - type: marking
   id: TailFluffy
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi
@@ -67,7 +61,6 @@
 - type: marking
   id: TailFox
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi
@@ -78,7 +71,6 @@
 - type: marking
   id: TailGecko
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Reptilian]
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi
@@ -91,7 +83,6 @@
 - type: marking
   id: TailKitsune
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi
@@ -102,7 +93,6 @@
 - type: marking
   id: TailMaw
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Reptilian, SlimePerson]
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi
@@ -111,7 +101,6 @@
 - type: marking
   id: TailShark
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Reptilian]
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi
@@ -122,7 +111,6 @@
 - type: marking
   id: TailSuccubus
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: []
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi
@@ -131,7 +119,6 @@
 - type: marking
   id: TailTentacle
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Human, Oni]
   sprites:
     - sprite: _Backmen/Mobs/Customization/tails32x32.rsi

@@ -3,7 +3,6 @@
 - type: marking
   id: FelinidEarsBasic
   bodyPart: HeadSide
-  markingCategory: HeadSide
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
   - sprite: _Backmen/Mobs/Customization/felinid_ears.rsi
@@ -14,7 +13,6 @@
 - type: marking
   id: FelinidEarsCurled
   bodyPart: HeadSide
-  markingCategory: HeadSide
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
   - sprite: _Backmen/Mobs/Customization/felinid_ears.rsi
@@ -25,7 +23,6 @@
 - type: marking
   id: FelinidEarsDroopy
   bodyPart: HeadSide
-  markingCategory: HeadSide
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
   - sprite: _Backmen/Mobs/Customization/felinid_ears.rsi
@@ -36,7 +33,6 @@
 - type: marking
   id: FelinidEarsFuzzy
   bodyPart: HeadSide
-  markingCategory: HeadSide
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
   - sprite: _Backmen/Mobs/Customization/felinid_ears.rsi
@@ -47,7 +43,6 @@
 - type: marking
   id: FelinidEarsStubby
   bodyPart: HeadSide
-  markingCategory: HeadSide
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
   - sprite: _Backmen/Mobs/Customization/felinid_ears.rsi
@@ -58,7 +53,6 @@
 - type: marking
   id: FelinidEarsTall
   bodyPart: HeadSide
-  markingCategory: HeadSide
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
   - sprite: _Backmen/Mobs/Customization/felinid_ears.rsi
@@ -71,7 +65,6 @@
 - type: marking
   id: FelinidEarsTorn
   bodyPart: HeadSide
-  markingCategory: HeadSide
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
   - sprite: _Backmen/Mobs/Customization/felinid_ears.rsi
@@ -82,7 +75,6 @@
 - type: marking
   id: FelinidEarsWide
   bodyPart: HeadSide
-  markingCategory: HeadSide
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
   - sprite: _Backmen/Mobs/Customization/felinid_ears.rsi
@@ -95,7 +87,6 @@
 - type: marking
   id: FelinidTailBasic
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
   - sprite: _Backmen/Mobs/Customization/felinid_tails.rsi
@@ -108,7 +99,6 @@
 - type: marking
   id: FelinidTailBasicWithBow
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
   - sprite: _Backmen/Mobs/Customization/felinid_tails.rsi
@@ -123,7 +113,6 @@
 - type: marking
   id: FelinidTailBasicWithBell
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
   - sprite: _Backmen/Mobs/Customization/felinid_tails.rsi
@@ -138,7 +127,6 @@
 - type: marking
   id: FelinidTailBasicWithBowAndBell
   bodyPart: Tail
-  markingCategory: Tail
 #  speciesRestriction: [Anthropomorph, Felinid]
   sprites:
   - sprite: _Backmen/Mobs/Customization/felinid_tails.rsi
