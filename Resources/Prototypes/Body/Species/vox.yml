@@ -4,11 +4,9 @@
   limits:
     enum.HumanoidVisualLayers.Hair:
       limit: 1
-      onlyGroupWhitelisted: true
       required: false
     enum.HumanoidVisualLayers.FacialHair:
       limit: 1
-      onlyGroupWhitelisted: true
       required: false
     enum.HumanoidVisualLayers.Head:
       limit: 4
@@ -65,11 +63,9 @@
     enum.HumanoidVisualLayers.UndergarmentTop:
       limit: 1
       required: false
-      nudityDefault: [ UndergarmentTopTanktopVox ]
     enum.HumanoidVisualLayers.UndergarmentBottom:
       limit: 1
       required: false
-      nudityDefault: [ UndergarmentBottomBoxersVox ]
 
 - type: entity
   parent: BaseSpeciesAppearance

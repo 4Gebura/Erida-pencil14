@@ -65,11 +65,11 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
         _escapeWindow.OnClose += DeactivateButton;
         _escapeWindow.OnOpen += ActivateButton;
 
-        _escapeWindow.FeedbackButton.OnPressed += _ =>
-        {
-            CloseEscapeWindow();
-            _feedback.ToggleWindow();
-        };
+        // _escapeWindow.FeedbackButton.OnPressed += _ =>
+        // {
+        //     CloseEscapeWindow();
+        //     _feedback.ToggleWindow();
+        // };
 
         _escapeWindow.ChangelogButton.OnPressed += _ =>
         {

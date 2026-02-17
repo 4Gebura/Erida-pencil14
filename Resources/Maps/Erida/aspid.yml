@@ -115087,13 +115087,6 @@ entities:
       parent: 2
     - type: Fixtures
       fixtures: {}
-- proto: ShippingContainerNanotrasen
-  entities:
-  - uid: 16110
-    components:
-    - type: Transform
-      pos: -48.5,-7.5
-      parent: 2
 - proto: Shovel
   entities:
   - uid: 16111

@@ -246,6 +246,10 @@ namespace Content.Client.Lobby.UI
                 SpeciesButton.SelectId(args.Id);
                 SetSpecies(_species[args.Id].ID);
                 OnSkinColorOnValueChanged();
+                // Erida start
+                _markingsModel.Markings = [];
+                UpdateMarkings();
+                // Erida end
             };
 
             // Erida-start

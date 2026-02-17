@@ -1,7 +1,6 @@
 - type: markingsGroup
   parent: Undergarments
   id: Reptilian
-  onlyGroupWhitelisted: true
   limits:
     enum.HumanoidVisualLayers.Hair:
       limit: 0

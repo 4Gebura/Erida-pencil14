@@ -127,12 +127,16 @@
   - FauxTileAstroGrass
   - FauxTileMowedAstroGrass
   - FauxTileJungleAstroGrass
+  - FauxTileDarkAstroGrass
+  - FauxTileLightAstroGrass
   - FauxTileAstroIce
   - FauxTileAstroSnow
   - FauxTileAstroAsteroidSand
   - FauxTileDarkAstroGrass
   - FauxTileLightAstroGrass
   - FauxTileDesertAstroSand
+  - FauxTileAstroIronsand
+  - FauxTileAstroIronsandBorderless
   technologyPrerequisites:
   - Entertainment
   position: 2,10
@@ -154,7 +158,6 @@
    - Holoprojector
    - WetFloorSign
    - ClothingHeadHatCone
-   - TowelColorWhite
   technologyPrerequisites:
   - ServiceMachines
   position: 4,6

@@ -127,7 +127,6 @@
     - AtmosStatic
     - CablesStatic
     - PaperworkStatic
-    - TowelsStatic
     - CargoStatic
     - BasicChemistryStatic
     - RollerBedsStatic
@@ -207,8 +206,10 @@
     - EngineeringWeapons
     - Chemistry
     - Janitor
+    - Botany
     - Instruments
     - Equipment
+    - FauxTiles
 
   - type: EmagLatheRecipes
     emagDynamicPacks:
@@ -504,7 +505,6 @@
     idleState: icon
     runningState: building
     staticPacks:
-    - TowelsStatic
     - ClothingCivilian
     - ClothingCargo
     - ClothingCommand

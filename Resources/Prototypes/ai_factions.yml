@@ -14,8 +14,9 @@
 - type: npcFaction
   id: NanoTrasen
   hostile:
-  - SimpleHostile
   - InteQ
+  - SimpleHostile
+  - Syndicate
   - Xeno
   - Zombie
   - Revolutionary
@@ -68,6 +69,7 @@
   id: Syndicate
   hostile:
   - InteQ
+  - NanoTrasen
   - SimpleHostile
   - Xeno
   - PetsNT
@@ -80,6 +82,7 @@
 - type: npcFaction
   id: Xeno
   hostile:
+  - InteQ
   - NanoTrasen
   - Syndicate
   - Passive

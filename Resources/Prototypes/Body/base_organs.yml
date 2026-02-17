@@ -8,11 +8,9 @@
     enum.HumanoidVisualLayers.UndergarmentTop:
       limit: 1
       required: false
-      nudityDefault: [ UndergarmentTopTanktop ]
     enum.HumanoidVisualLayers.UndergarmentBottom:
       limit: 1
       required: false
-      nudityDefault: [ UndergarmentBottomBoxers ]
 
 - type: entity
   id: OrganBase

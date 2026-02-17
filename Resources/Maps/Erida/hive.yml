@@ -141180,23 +141180,6 @@ entities:
     - type: Transform
       pos: 1.5,-48.5
       parent: 2
-- proto: SpawnPointBoxer
-  entities:
-  - uid: 20932
-    components:
-    - type: Transform
-      pos: 20.5,22.5
-      parent: 2
-  - uid: 20933
-    components:
-    - type: Transform
-      pos: 16.5,16.5
-      parent: 2
-  - uid: 20934
-    components:
-    - type: Transform
-      pos: 2.5,-48.5
-      parent: 2
 - proto: SpawnPointBrigmedic
   entities:
   - uid: 20935

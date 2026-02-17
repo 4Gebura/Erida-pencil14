@@ -3,6 +3,7 @@
 - type: latheRecipePack
   id: ToolsStatic
   recipes:
+  - HandLabeler
   - VoiceSensor
   - Wirecutter
   - Screwdriver
@@ -77,6 +78,10 @@
 - type: latheRecipePack
   id: EngineeringBoards
   recipes:
+  # ERIDA-start
+  - TinyFanCircuitboard
+  - TinyFanDirectionalCircuitboard
+  # ERIDA-end
   - ThermomachineFreezerMachineCircuitBoard
   - HellfireFreezerMachineCircuitBoard
   - PortableScrubberMachineCircuitBoard

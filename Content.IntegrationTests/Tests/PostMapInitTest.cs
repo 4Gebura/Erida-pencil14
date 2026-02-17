@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using YamlDotNet.RepresentationModel;
 using Content.Server.Administration.Systems;
 using Content.Server.GameTicking;
+using Content.Server.Maps;
 using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Systems;
 using Content.Server.Spawners.Components;
@@ -72,6 +73,15 @@ namespace Content.IntegrationTests.Tests
         private static readonly string[] DoNotMapWhitelist =
         {
             "/Maps/centcomm.yml",
+            "/Maps/bagel.yml", // Contains mime's rubber stamp --> Either fix this, remove the category, or remove this comment if intentional.
+            "/Maps/reach.yml", // Contains handheld crew monitor
+            "/Maps/Shuttles/ShuttleEvent/cruiser.yml", // Contains LSE-1200c "Perforator"
+            "/Maps/Shuttles/ShuttleEvent/honki.yml", // Contains golden honker, clown's rubber stamp
+            "/Maps/Shuttles/ShuttleEvent/instigator.yml", // Contains EXP-320g "Friendship"
+            "/Maps/Shuttles/ShuttleEvent/syndie_evacpod.yml", // Contains syndicate rubber stamp
+            "/Maps/Erida/WonderDelta.yml", // Contains LSE-1200c
+            "/Maps/Erida/bagel.yml", // Contains mime stamp
+            "/Maps/Erida/silly.yml", // Contains syndie stamp
             "/Maps/Shuttles/AdminSpawn/**" // admin gaming
         };
 
@@ -100,6 +110,28 @@ namespace Content.IntegrationTests.Tests
             "Elkridge",
             "dm01-entryway",
             "Exo",
+            "BackmenAspid",
+            "BackmenKettle",
+            "BackmenBox",
+            "BackmenTortuga",
+            "BackmenHive",
+            "BackmenShoukou",
+            "BackmenRook",
+            "BackmenDelta",
+            "Amber_Erida",
+            "Bagel_Erida",
+            "Convex_Erida",
+            "Elkridge_Erida",
+            "Fland_Erida",
+            "Loop_Erida",
+            "Marathon_Erida",
+            "Meta_Erida",
+            "Oasis_Erida",
+            "Omega_Erida",
+            "Packed_Erida",
+            "Plasma_Erida",
+            "Train",
+            "CorvaxSilly",
             "Snowball",
         };
 

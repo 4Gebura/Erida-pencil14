@@ -1172,6 +1172,13 @@ entities:
       parent: 145
     - type: Physics
       canCollide: False
+- proto: InteQVanguardIDCard
+  entities:
+  - uid: 95
+    components:
+    - type: Transform
+      pos: 1.4261382,-2.1842275
+      parent: 1
 - proto: MedkitCombatFilled
   entities:
   - uid: 151

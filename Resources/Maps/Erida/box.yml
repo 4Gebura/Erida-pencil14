@@ -156066,42 +156066,6 @@ entities:
     - type: Transform
       pos: 2.5,6.5
       parent: 2
-    - type: Storage
-      storedItems:
-        1432:
-          position: 0,0
-          _rotation: South
-        1433:
-          position: 1,0
-          _rotation: South
-        1431:
-          position: 2,0
-          _rotation: South
-        1434:
-          position: 3,0
-          _rotation: South
-        1428:
-          position: 0,3
-          _rotation: South
-        1429:
-          position: 1,3
-          _rotation: East
-        1430:
-          position: 3,3
-          _rotation: North
-    - type: ContainerContainer
-      containers:
-        storagebase: !type:Container
-          showEnts: False
-          occludes: True
-          ents:
-          - 1432
-          - 1433
-          - 1431
-          - 1434
-          - 1428
-          - 1429
-          - 1430
     - type: Fixtures
       fixtures: {}
   - uid: 11382
@@ -156109,42 +156073,6 @@ entities:
     - type: Transform
       pos: 2.5,18.5
       parent: 2
-    - type: Storage
-      storedItems:
-        11388:
-          position: 0,0
-          _rotation: South
-        11386:
-          position: 1,0
-          _rotation: South
-        11387:
-          position: 2,0
-          _rotation: South
-        11389:
-          position: 3,0
-          _rotation: South
-        11385:
-          position: 2,3
-          _rotation: North
-        11383:
-          position: 1,3
-          _rotation: North
-        11384:
-          position: 0,3
-          _rotation: North
-    - type: ContainerContainer
-      containers:
-        storagebase: !type:Container
-          showEnts: False
-          occludes: True
-          ents:
-          - 11388
-          - 11386
-          - 11387
-          - 11389
-          - 11384
-          - 11383
-          - 11385
     - type: Fixtures
       fixtures: {}
 - proto: ShelfKitchen
@@ -156242,13 +156170,6 @@ entities:
     components:
     - type: Transform
       pos: 25.572826,35.401947
-      parent: 2
-- proto: ShippingContainerDeforest
-  entities:
-  - uid: 22974
-    components:
-    - type: Transform
-      pos: 63.5,11.5
       parent: 2
 - proto: Shower
   entities:
@@ -161546,18 +161467,6 @@ entities:
     - type: Transform
       pos: 47.5,-4.5
       parent: 2
-- proto: SpawnPointBoxer
-  entities:
-  - uid: 23689
-    components:
-    - type: Transform
-      pos: 22.5,11.5
-      parent: 2
-  - uid: 23690
-    components:
-    - type: Transform
-      pos: 24.5,12.5
-      parent: 2
 - proto: SpawnPointBrigmedic
   entities:
   - uid: 23691
@@ -162083,13 +161992,6 @@ entities:
     components:
     - type: Transform
       pos: -0.5,30.5
-      parent: 2
-- proto: SpawnPointZookeeper
-  entities:
-  - uid: 23781
-    components:
-    - type: Transform
-      pos: 33.5,12.5
       parent: 2
 - proto: SpawnVendingMachineRestockFoodDrink
   entities:
@@ -169669,77 +169571,6 @@ entities:
     - type: Transform
       pos: 0.5,-0.5
       parent: 29193
-- proto: TowelColorBlack
-  entities:
-  - uid: 1431
-    components:
-    - type: Transform
-      parent: 1427
-    - type: Physics
-      canCollide: False
-- proto: TowelColorBrown
-  entities:
-  - uid: 1432
-    components:
-    - type: Transform
-      parent: 1427
-    - type: Physics
-      canCollide: False
-- proto: TowelColorCentcom
-  entities:
-  - uid: 24957
-    components:
-    - type: Transform
-      pos: -30.5,-74.5
-      parent: 2
-- proto: TowelColorDarkBlue
-  entities:
-  - uid: 11386
-    components:
-    - type: Transform
-      parent: 11382
-    - type: Physics
-      canCollide: False
-- proto: TowelColorOrange
-  entities:
-  - uid: 1433
-    components:
-    - type: Transform
-      parent: 1427
-    - type: Physics
-      canCollide: False
-- proto: TowelColorPink
-  entities:
-  - uid: 11387
-    components:
-    - type: Transform
-      parent: 11382
-    - type: Physics
-      canCollide: False
-- proto: TowelColorPurple
-  entities:
-  - uid: 1434
-    components:
-    - type: Transform
-      parent: 1427
-    - type: Physics
-      canCollide: False
-- proto: TowelColorSilver
-  entities:
-  - uid: 11388
-    components:
-    - type: Transform
-      parent: 11382
-    - type: Physics
-      canCollide: False
-- proto: TowelColorTeal
-  entities:
-  - uid: 11389
-    components:
-    - type: Transform
-      parent: 11382
-    - type: Physics
-      canCollide: False
 - proto: ToyAi
   entities:
   - uid: 24958

@@ -6,6 +6,7 @@ using Content.Server.Administration.Managers;
 using Content.Server.Discord.WebhookMessages;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Presets;
+using Content.Server.Maps;
 using Content.Server.Roles;
 using Content.Server.RoundEnd;
 using Content.Shared.CCVar;
@@ -40,6 +41,7 @@ namespace Content.Server.Voting.Managers
             {StandardVoteType.Map, CCVars.VoteMapEnabled},
             {StandardVoteType.Votekick, CCVars.VotekickEnabled}
         };
+        private Dictionary<string, int> _cooldownMaps = new(); // Erida
 
         public void CreateStandardVote(ICommonSession? initiator, StandardVoteType voteType, string[]? args = null)
         {
@@ -279,7 +281,8 @@ namespace Content.Server.Voting.Managers
 
             foreach (var (k, v) in maps)
             {
-                options.Options.Add((v, k));
+                if (!_cooldownMaps.ContainsKey(k.ID)) // Erida
+                    options.Options.Add((v, k));
             }
 
             WirePresetVoteInitiator(options, initiator);
@@ -306,14 +309,11 @@ namespace Content.Server.Voting.Managers
                 var ticker = _entityManager.EntitySysManager.GetEntitySystem<GameTicker>();
                 if (ticker.CanUpdateMap())
                 {
-                    if (_gameMapManager.CheckMapExists(picked.ID))
+                    if (_gameMapManager.TrySelectMapIfEligible(picked.ID))
                     {
                         _gameMapManager.SelectMap(picked.ID);
                         ticker.UpdateInfoText();
-                    }
-                    else
-                    {
-                        _chatManager.DispatchServerAnnouncement(Loc.GetString("ui-vote-map-invalid", ("winner", maps[picked])));
+                        _cooldownMaps.Add(picked.ID, _cfg.GetCVar(CCVars.MapHideDuration)); // Erida
                     }
                 }
                 else
@@ -609,6 +609,17 @@ namespace Content.Server.Voting.Managers
                 presets[preset.ID] = preset.ModeTitle;
             }
             return presets;
+        }
+
+        public void DecreaseMapCooldowns()
+        {
+            foreach (var map in _cooldownMaps)
+            {
+                _cooldownMaps[map.Key] -= 1;
+
+                if (_cooldownMaps[map.Key] <= 0)
+                    _cooldownMaps.Remove(map.Key);
+            }
         }
     }
 }

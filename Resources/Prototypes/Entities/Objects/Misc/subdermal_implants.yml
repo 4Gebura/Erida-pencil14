@@ -162,20 +162,20 @@
     - Syndicate
 
 - type: entity
-  parent: [ BaseSubdermalImplant, StorePresetUplinkSyndicate ]
-  id: UplinkImplantSyndicate
+  parent: [ BaseSubdermalImplant, StorePresetUplink ]
+  id: UplinkImplant
   name: uplink implant
   description: This implant lets the user access a hidden Syndicate uplink at will.
   categories: [ HideSpawnMenu ]
   components:
   - type: SubdermalImplant
-    implantAction: ActionOpenUplinkImplantSyndicate
+    implantAction: ActionOpenUplinkImplant
     whitelist:
       components:
       - Hands # prevent mouse buying grenade penguin since its not telepathic
   - type: Store
     balance:
-      TelecrystalRed: 0
+      Telecrystal: 0
   - type: UserInterface
     interfaces:
       enum.StoreUiKey.Key:

@@ -24,6 +24,8 @@
   - DeviceQuantumSpinInverter
   - DeviceDesynchronizer
   - ClothingBackpackHarmpack
+  - ClothingEyesHudDiagnostic # Backmen
+  - PersonalAI # Backmen
 
 - type: latheRecipePack
   id: ScienceClothing
@@ -46,6 +48,7 @@
 - type: latheRecipePack
   id: ScienceWeapons
   recipes:
+  - WeaponLaserSvalinn
   - WeaponPistolCHIMP
   - WeaponForceGun
   - WeaponProtoKineticAccelerator
@@ -68,6 +71,7 @@
 - type: latheRecipePack
   id: ScienceBoards
   recipes:
+  - ResearchAndDevelopmentServerMachineCircuitboard
   - TurboItemRechargerCircuitboard
   - AutolatheHyperConvectionMachineCircuitboard
   - ProtolatheHyperConvectionMachineCircuitboard
