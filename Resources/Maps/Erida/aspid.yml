@@ -15536,16 +15536,6 @@ entities:
       - 12607
     - type: Fixtures
       fixtures: {}
-  - uid: 1172
-    components:
-    - type: Transform
-      pos: 27.5,27.5
-      parent: 2
-    - type: DeviceList
-      devices:
-      - 3307
-    - type: Fixtures
-      fixtures: {}
   - uid: 8674
     components:
     - type: Transform
@@ -89650,19 +89640,6 @@ entities:
     - type: DeviceNetwork
       deviceLists:
       - 8674
-  - uid: 3307
-    components:
-    - type: Transform
-      rot: 1.5707963267948966 rad
-      pos: 26.5,22.5
-      parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
-      deviceLists:
-      - 1172
-    - type: AtmosPipeColor
-      color: '#990000FF'
   - uid: 8673
     components:
     - type: Transform
@@ -135557,29 +135534,6 @@ entities:
       devices:
       - 20032
       - 20033
-- proto: WeaponEnergyTurretSecurity
-  entities:
-  - uid: 20039
-    components:
-    - type: Transform
-      pos: -9.5,60.5
-      parent: 2
-    - type: DeviceNetwork
-      configurators:
-      - invalid
-      deviceLists:
-      - 20040
-- proto: WeaponEnergyTurretSecurityControlPanel
-  entities:
-  - uid: 20040
-    components:
-    - type: Transform
-      rot: -1.5707963267948966 rad
-      pos: -3.5,63.5
-      parent: 2
-    - type: DeviceList
-      devices:
-      - 20039
 - proto: WeaponLaserCarbine
   entities:
   - uid: 16981
