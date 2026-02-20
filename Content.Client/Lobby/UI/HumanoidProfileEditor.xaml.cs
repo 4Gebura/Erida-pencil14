@@ -36,6 +36,8 @@ using Robust.Shared.Utility;
 using Direction = Robust.Shared.Maths.Direction;
 using Content.Shared.CCVar;
 using Content.Shared._Erida.Preference;
+using Robust.Shared.Physics.Systems;
+using Robust.Shared.Physics;
 
 namespace Content.Client.Lobby.UI
 {
@@ -250,6 +252,7 @@ namespace Content.Client.Lobby.UI
                 _markingsModel.Markings = [];
                 UpdateMarkings();
                 // Erida end
+                UpdateHeightWidthSliders(); // Goobstation: port EE height/width sliders
             };
 
             // Erida-start
@@ -267,6 +270,33 @@ namespace Content.Client.Lobby.UI
                 if (!string.IsNullOrEmpty(formattedMessage))
                     SetCustomSpecies(formattedMessage);
             };
+            // Erida end
+
+            // begin Goobstation: port EE height/width sliders
+            #region Height and Width
+
+            UpdateHeightWidthSliders();
+            UpdateDimensions(SliderUpdate.Both);
+
+            HeightSlider.OnValueChanged += _ => UpdateDimensions(SliderUpdate.Height);
+            WidthSlider.OnValueChanged += _ => UpdateDimensions(SliderUpdate.Width);
+
+            HeightReset.OnPressed += _ =>
+            {
+                var prototype = _species.Find(x => x.ID == Profile?.Species) ?? _species.First();
+                HeightSlider.Value = prototype.DefaultHeight;
+                UpdateDimensions(SliderUpdate.Height);
+            };
+
+            WidthReset.OnPressed += _ =>
+            {
+                var prototype = _species.Find(x => x.ID == Profile?.Species) ?? _species.First();
+                WidthSlider.Value = prototype.DefaultWidth;
+                UpdateDimensions(SliderUpdate.Width);
+            };
+
+            #endregion Height and Width
+            // end Goobstation: port EE height/width sliders
 
             #region Skin
 
@@ -887,6 +917,8 @@ namespace Content.Client.Lobby.UI
             UpdateTTSVoicesControls(); // Corvax-TTS
             UpdateCorporationControls(); // Erida edit
             UpdateCustomSpeciesEdit(); // Erida edit
+            UpdateHeightWidthSliders(); // Goobstation: port EE height/width sliders
+            UpdateWeight(); // Goobstation: port EE height/width sliders
 
 
             RefreshAntags();
@@ -1489,6 +1521,22 @@ namespace Content.Client.Lobby.UI
         }
         // Erida end
 
+        // Goob Station - Start
+        private void SetProfileHeight(float height)
+        {
+            Profile = Profile?.WithHeight(height);
+            ReloadProfilePreview();
+            IsDirty = true;
+        }
+
+        private void SetProfileWidth(float width)
+        {
+            Profile = Profile?.WithWidth(width);
+            ReloadProfilePreview();
+            IsDirty = true;
+        }
+        // Goob Station - End
+
 
         public bool IsDirty
         {
@@ -1725,6 +1773,103 @@ namespace Content.Client.Lobby.UI
 
             SpawnPriorityButton.SelectId((int) Profile.SpawnPriority);
         }
+
+        // begin Goobstation: port EE height/width sliders
+        private void UpdateHeightWidthSliders()
+        {
+            if (Profile is null)
+                return;
+
+            var species = _species.Find(x => x.ID == Profile?.Species) ?? _species.First();
+
+            // we increase the min/max values of the sliders before we set their value, just so that we don't accidentally clamp down on a value loaded from a profile when we shouldn't
+            HeightSlider.MinValue = 0;
+            HeightSlider.MaxValue = 2;
+            HeightSlider.SetValueWithoutEvent(Profile?.Height ?? species.DefaultHeight);
+            HeightSlider.MinValue = species.MinHeight;
+            HeightSlider.MaxValue = species.MaxHeight;
+
+            WidthSlider.MinValue = 0;
+            WidthSlider.MaxValue = 2;
+            WidthSlider.SetValueWithoutEvent(Profile?.Width ?? species.DefaultWidth);
+            WidthSlider.MinValue = species.MinWidth;
+            WidthSlider.MaxValue = species.MaxWidth;
+
+            var height = MathF.Round(species.AverageHeight * HeightSlider.Value);
+            HeightLabel.Text = Loc.GetString("humanoid-profile-editor-height-label", ("height", (int) height));
+
+            var width = MathF.Round(species.AverageWidth * WidthSlider.Value);
+            WidthLabel.Text = Loc.GetString("humanoid-profile-editor-width-label", ("width", (int) width));
+
+            UpdateDimensions(SliderUpdate.Both);
+        }
+
+        private enum SliderUpdate
+        {
+            Height,
+            Width,
+            Both
+        }
+
+        private void UpdateDimensions(SliderUpdate updateType)
+        {
+            if (Profile == null)
+                return;
+
+            var species = _species.Find(x => x.ID == Profile?.Species) ?? _species.First();
+
+            var heightValue = Math.Clamp(HeightSlider.Value, species.MinHeight, species.MaxHeight);
+            var widthValue = Math.Clamp(WidthSlider.Value, species.MinWidth, species.MaxWidth);
+            var sizeRatio = species.SizeRatio;
+            var ratio = heightValue / widthValue;
+
+            if (updateType == SliderUpdate.Height || updateType == SliderUpdate.Both)
+                if (ratio < 1 / sizeRatio || ratio > sizeRatio)
+                    widthValue = heightValue / (ratio < 1 / sizeRatio ? (1 / sizeRatio) : sizeRatio);
+
+            if (updateType == SliderUpdate.Width || updateType == SliderUpdate.Both)
+                if (ratio < 1 / sizeRatio || ratio > sizeRatio)
+                    heightValue = widthValue * (ratio < 1 / sizeRatio ? (1 / sizeRatio) : sizeRatio);
+
+            heightValue = Math.Clamp(heightValue, species.MinHeight, species.MaxHeight);
+            widthValue = Math.Clamp(widthValue, species.MinWidth, species.MaxWidth);
+
+            HeightSlider.SetValueWithoutEvent(heightValue);
+            WidthSlider.SetValueWithoutEvent(widthValue);
+
+            SetProfileHeight(heightValue);
+            SetProfileWidth(widthValue);
+
+            var height = MathF.Round(species.AverageHeight * HeightSlider.Value);
+            HeightLabel.Text = Loc.GetString("humanoid-profile-editor-height-label", ("height", (int) height));
+
+            var width = MathF.Round(species.AverageWidth * WidthSlider.Value);
+            WidthLabel.Text = Loc.GetString("humanoid-profile-editor-width-label", ("width", (int) width));
+
+            UpdateWeight();
+        }
+
+        private void UpdateWeight()
+        {
+            if (Profile == null)
+                return;
+
+            var species = _species.Find(x => x.ID == Profile.Species) ?? _species.First();
+            //  TODO: Remove obsolete method
+            _prototypeManager.Index(species.Prototype).TryGetComponent<FixturesComponent>(out var fixture, _entManager.ComponentFactory);
+
+            if (fixture != null)
+            {
+                var avg = (Profile.Width + Profile.Height) / 2;
+                var weight = FixtureSystem.GetMassData(fixture.Fixtures["fix1"].Shape, fixture.Fixtures["fix1"].Density).Mass * avg;
+                WeightLabel.Text = Loc.GetString("humanoid-profile-editor-weight-label", ("weight", (int)weight));
+            }
+            else // Whelp, the fixture doesn't exist, guesstimate it instead
+                WeightLabel.Text = Loc.GetString("humanoid-profile-editor-weight-label", ("weight", (int)71));
+
+            _sprite.SetScale((SpriteView.PreviewDummy, SpriteView.Sprite), new Vector2(Profile.Width, Profile.Height));
+        }
+        // end Goobstation: port EE height/width sliders
 
         private void UpdateEyePickers()
         {

@@ -203,4 +203,18 @@ public sealed partial class BloodstreamComponent : Component
     /// </summary>
     [DataField]
     public ProtoId<AlertPrototype> BleedingAlert = "Bleed";
+
+    /// <summary>
+    /// Max volume of internal chemical solution storage
+    /// </summary>
+    [DataField]
+    public FixedPoint2 ChemicalMaxVolume = FixedPoint2.New(250);
+
+    /// <summary>
+    /// Max volume of internal blood storage,
+    /// and starting level of blood.
+    /// </summary>
+    [DataField]
+    public FixedPoint2 BloodMaxVolume = FixedPoint2.New(300);
+
 }

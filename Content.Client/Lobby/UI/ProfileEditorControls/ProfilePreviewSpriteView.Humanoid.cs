@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Numerics;
 using Content.Client.Humanoid;
 using Content.Client.Station;
 using Content.Shared.Body;
@@ -10,6 +11,7 @@ using Content.Shared.Inventory;
 using Content.Shared.Preferences;
 using Content.Shared.Preferences.Loadouts;
 using Content.Shared.Roles;
+using Robust.Client.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
@@ -58,6 +60,12 @@ public sealed partial class ProfilePreviewSpriteView
         {
             PreviewDummy = EntMan.SpawnEntity(_prototypeManager.Index(HumanoidCharacterProfile.DefaultSpecies).DollPrototype, MapCoordinates.Nullspace);
         }
+
+        var spriteComponent = EntMan.GetComponent<SpriteComponent>(PreviewDummy);
+
+        if (humanoid != null && SpriteSystem != null)
+            SpriteSystem.SetScale((PreviewDummy, spriteComponent), new Vector2(humanoid.Width, humanoid.Height));
+
 
         if (humanoid != null && jobClothes)
         {

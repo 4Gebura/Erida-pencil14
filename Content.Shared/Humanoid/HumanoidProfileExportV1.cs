@@ -121,6 +121,12 @@ public sealed partial class HumanoidCharacterProfileV1
     // Erida start
     [DataField]
     public CorporationPreference Corporation;
+
+    [DataField]
+    public float Height { get; set; }
+
+    [DataField]
+    public float Width { get; set; }
     // Erida end
 
     [DataField]
@@ -128,7 +134,7 @@ public sealed partial class HumanoidCharacterProfileV1
 
     public HumanoidCharacterProfile ToV2()
     {
-        return new(Name, FlavorText, OOCContent, CharacterContent, GreenContent, YellowContent, RedContent, TagsContent, LinksContent, NSFWContent, NSFWOOCContent, NSFWLinksContent, NSFWTagsContent, Species, CustomSpecies, Voice, Age, Sex, Gender, Appearance.ToV2(Species), SpawnPriority, Corporation, JobPriorities, PreferenceUnavailable, AntagPreferences, TraitPreferences, Loadouts);
+        return new(Name, FlavorText, OOCContent, CharacterContent, GreenContent, YellowContent, RedContent, TagsContent, LinksContent, NSFWContent, NSFWOOCContent, NSFWLinksContent, NSFWTagsContent, Species, CustomSpecies, Height, Width, Voice, Age, Sex, Gender, Appearance.ToV2(Species), SpawnPriority, Corporation, JobPriorities, PreferenceUnavailable, AntagPreferences, TraitPreferences, Loadouts);
     }
 }
 

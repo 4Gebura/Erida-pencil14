@@ -331,6 +331,8 @@ namespace Content.Server.Database
                 // Erida-End
                 profile.Species,
                 profile.CustomSpecies, // Erida
+                profile.Height, // Goobstation: port EE height/width sliders
+                profile.Width, // Goobstation: port EE height/width sliders
                 voice, // Corvax-TTS
                 profile.Age,
                 sex,
@@ -374,6 +376,8 @@ namespace Content.Server.Database
             // Erida-End
             profile.Species = humanoid.Species;
             profile.CustomSpecies = humanoid.CustomSpecies; // Erida edit
+            profile.Height = humanoid.Height; // Goobstation: port EE height/width sliders
+            profile.Width = humanoid.Width; // Goobstation: port EE height/width sliders
             profile.Voice = humanoid.Voice; // Corvax-TTS
             profile.Age = humanoid.Age;
             profile.Sex = humanoid.Sex.ToString();
