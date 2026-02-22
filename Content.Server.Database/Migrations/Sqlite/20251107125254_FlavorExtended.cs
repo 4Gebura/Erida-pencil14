@@ -2,88 +2,67 @@
 
 #nullable disable
 
-namespace Content.Server.Database.Migrations.Postgres
+namespace Content.Server.Database.Migrations.Sqlite
 {
     /// <inheritdoc />
-    public partial class ExtendedExamine : Migration
+    public partial class FlavorExtended : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
+                name: "oocflavor_text",
+                table: "profile",
+                type: "TEXT",
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.AddColumn<string>(
                 name: "character_flavor_text",
                 table: "profile",
-                type: "text",
+                type: "TEXT",
                 nullable: false,
                 defaultValue: "");
 
             migrationBuilder.AddColumn<string>(
                 name: "green_flavor_text",
                 table: "profile",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "links_flavor_text",
-                table: "profile",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "nsfwflavor_text",
-                table: "profile",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "nsfwlinks_flavor_text",
-                table: "profile",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "nsfwoocflavor_text",
-                table: "profile",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "nsfwtags_flavor_text",
-                table: "profile",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "oocflavor_text",
-                table: "profile",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "red_flavor_text",
-                table: "profile",
-                type: "text",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "tags_flavor_text",
-                table: "profile",
-                type: "text",
+                type: "TEXT",
                 nullable: false,
                 defaultValue: "");
 
             migrationBuilder.AddColumn<string>(
                 name: "yellow_flavor_text",
                 table: "profile",
-                type: "text",
+                type: "TEXT",
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.AddColumn<string>(
+                name: "red_flavor_text",
+                table: "profile",
+                type: "TEXT",
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.AddColumn<string>(
+                name: "tags_flavor_text",
+                table: "profile",
+                type: "TEXT",
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.AddColumn<string>(
+                name: "links_flavor_text",
+                table: "profile",
+                type: "TEXT",
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.AddColumn<string>(
+                name: "nsfwflavor_text",
+                table: "profile",
+                type: "TEXT",
                 nullable: false,
                 defaultValue: "");
         }
@@ -92,6 +71,10 @@ namespace Content.Server.Database.Migrations.Postgres
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
+                name: "oocflavor_text",
+                table: "profile");
+
+            migrationBuilder.DropColumn(
                 name: "character_flavor_text",
                 table: "profile");
 
@@ -100,27 +83,7 @@ namespace Content.Server.Database.Migrations.Postgres
                 table: "profile");
 
             migrationBuilder.DropColumn(
-                name: "links_flavor_text",
-                table: "profile");
-
-            migrationBuilder.DropColumn(
-                name: "nsfwflavor_text",
-                table: "profile");
-
-            migrationBuilder.DropColumn(
-                name: "nsfwlinks_flavor_text",
-                table: "profile");
-
-            migrationBuilder.DropColumn(
-                name: "nsfwoocflavor_text",
-                table: "profile");
-
-            migrationBuilder.DropColumn(
-                name: "nsfwtags_flavor_text",
-                table: "profile");
-
-            migrationBuilder.DropColumn(
-                name: "oocflavor_text",
+                name: "yellow_flavor_text",
                 table: "profile");
 
             migrationBuilder.DropColumn(
@@ -132,7 +95,11 @@ namespace Content.Server.Database.Migrations.Postgres
                 table: "profile");
 
             migrationBuilder.DropColumn(
-                name: "yellow_flavor_text",
+                name: "links_flavor_text",
+                table: "profile");
+
+            migrationBuilder.DropColumn(
+                name: "nsfwflavor_text",
                 table: "profile");
         }
     }

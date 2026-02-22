@@ -5,23 +5,24 @@
 namespace Content.Server.Database.Migrations.Sqlite
 {
     /// <inheritdoc />
-    public partial class OrganMarkings : Migration
+    public partial class CorporatePreference : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<byte[]>(
-                name: "organ_markings",
+            migrationBuilder.AddColumn<int>(
+                name: "corporation",
                 table: "profile",
-                type: "jsonb",
-                nullable: true);
+                type: "INTEGER",
+                nullable: false,
+                defaultValue: 0);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "organ_markings",
+                name: "corporation",
                 table: "profile");
         }
     }
