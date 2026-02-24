@@ -42,4 +42,13 @@ public sealed partial class HumanoidProfileComponent : Component
     [DataField, AutoNetworkedField]
     public CorporationPreference Corporation;
     // Erida end
+
+    // begin Goobstation: port EE height/width sliders
+    [DataField, AutoNetworkedField]
+    public float Height { get; set; }
+
+    [DataField, AutoNetworkedField]
+    public float Width { get; set; }
+    // end Goobstation: port EE height/width sliders
+
 }

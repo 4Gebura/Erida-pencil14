@@ -22,6 +22,7 @@ using Robust.Shared;
 using YamlDotNet.RepresentationModel;
 using Content.Shared._Erida.TTS;
 using Content.Shared._Erida.Preference;
+using Content.Shared._DV.Traits; // DeltaV - Traits rework
 
 namespace Content.Shared.Preferences
 {
@@ -133,6 +134,15 @@ namespace Content.Shared.Preferences
 
         [DataField]
         public Gender Gender { get; private set; } = Gender.Male;
+
+        // begin Goobstation: port EE height/width sliders
+        [DataField]
+        public float Height { get; private set; }
+
+        [DataField]
+        public float Width { get; private set; }
+        // end Goobstation: port EE height/width sliders
+
         // Erida start
         [DataField]
         public CorporationPreference Corporation { get; private set; } = CorporationPreference.Outsource;
@@ -190,6 +200,8 @@ namespace Content.Shared.Preferences
             string species,
             string customspecies,
             // Erida end
+            float height, // Goobstation: port EE height/width sliders
+            float width, // Goobstation: port EE height/width sliders
             string voice, // Corvax-TTS
             int age,
             Sex sex,
@@ -220,6 +232,8 @@ namespace Content.Shared.Preferences
             // Erida-End
             Species = species;
             CustomSpecies = customspecies; // Erida edit
+            Height = height; // Goobstation: port EE height/width sliders
+            Width = width; // Goobstation: port EE height/width sliders
             Voice = voice; // Corvax-TTS
             Age = age;
             Sex = sex;
@@ -267,6 +281,8 @@ namespace Content.Shared.Preferences
                 // Erida-End
                 other.Species,
                 other.CustomSpecies, // Erida edit
+                other.Height, // Goobstation: port EE height/width sliders
+                other.Width, // Goobstation: port EE height/width sliders
                 other.Voice, // Corvax-TTS
                 other.Age,
                 other.Sex,
@@ -334,10 +350,16 @@ namespace Content.Shared.Preferences
 
             var sex = Sex.Unsexed;
             var age = 18;
+            var height = 1f; // Goobstation: port EE height/width sliders
+            var width = 1f; // Goobstation: port EE height/width sliders
+
             if (prototypeManager.TryIndex<SpeciesPrototype>(species, out var speciesPrototype))
             {
                 sex = random.Pick(speciesPrototype.Sexes);
                 age = random.Next(speciesPrototype.MinAge, speciesPrototype.OldAge); // people don't look and keep making 119 year old characters with zero rp, cap it at middle aged
+
+                height = random.NextFloat(speciesPrototype!.MinHeight, speciesPrototype.MaxHeight); // Goobstation: port EE height/width sliders
+                width = random.NextFloat(speciesPrototype!.MinWidth, speciesPrototype.MaxWidth); // Goobstation: port EE height/width sliders
             }
 
             // Corvax-TTS-Start
@@ -370,6 +392,8 @@ namespace Content.Shared.Preferences
                 Gender = gender,
                 Species = species,
                 Voice = voiceId, // Corvax-TTS
+                Width = width, // Goobstation: port EE height/width sliders
+                Height = height, // Goobstation: port EE height/width sliders
                 Appearance = HumanoidCharacterAppearance.Random(species, sex),
             };
         }
@@ -445,6 +469,19 @@ namespace Content.Shared.Preferences
             return new(this) { CustomSpecies = customspecies };
         }
         // Erida-End
+
+        // begin Goobstation: port EE height/width sliders
+        public HumanoidCharacterProfile WithHeight(float height)
+        {
+            return new(this) { Height = height };
+        }
+        public HumanoidCharacterProfile WithWidth(float width)
+        {
+            return new(this) { Width = width };
+        }
+        // end Goobstation: port EE height/width sliders
+
+
 
         public HumanoidCharacterProfile WithAge(int age)
         {
@@ -587,12 +624,12 @@ namespace Content.Shared.Preferences
             // Category not found so dump it.
             TraitCategoryPrototype? traitCategory = null;
 
-            if (category != null && !protoManager.Resolve(category, out traitCategory))
+            if (!protoManager.Resolve(category, out traitCategory)) // DeltaV 13/01/26 - Traits: Category is no longer nullable
                 return new(this);
 
             var list = new HashSet<ProtoId<TraitPrototype>>(_traitPreferences) { traitId };
 
-            if (traitCategory == null || traitCategory.MaxTraitPoints < 0)
+            if (traitCategory.MaxPoints < 0) // DeltaV 13/01/26 - Traits: Changed to MaxPoints
             {
                 return new(this)
                 {
@@ -613,7 +650,7 @@ namespace Content.Shared.Preferences
                 count += otherProto.Cost;
             }
 
-            if (count > traitCategory.MaxTraitPoints && traitProto.Cost != 0)
+            if (count > traitCategory.MaxPoints && traitProto.Cost != 0) // DeltaV 13/01/26 - Traits: Changed to MaxPoints
             {
                 return new(this);
             }
@@ -651,6 +688,8 @@ namespace Content.Shared.Preferences
             if (Gender != other.Gender) return false;
             if (Species != other.Species) return false;
             if (CustomSpecies != other.CustomSpecies) return false; // Erida edit
+            if (Height != other.Height) return false; // Goobstation: port EE height/width sliders
+            if (Width != other.Width) return false; // Goobstation: port EE height/width sliders
             if (Voice != other.Voice) return false; // Corvax-TTS
             if (PreferenceUnavailable != other.PreferenceUnavailable) return false;
             if (SpawnPriority != other.SpawnPriority) return false;
@@ -834,6 +873,16 @@ namespace Content.Shared.Preferences
                 customSpecies = FormattedMessage.RemoveMarkupOrThrow(CustomSpecies);
             }
 
+            // begin Goobstation: port EE height/width sliders
+            var height = Height;
+            if (speciesPrototype != null)
+                height = Math.Clamp(Height, speciesPrototype.MinHeight, speciesPrototype.MaxHeight);
+
+            var width = Width;
+            if (speciesPrototype != null)
+                width = Math.Clamp(Width, speciesPrototype.MinWidth, speciesPrototype.MaxWidth);
+            // end Goobstation: port EE height/width sliders
+
             string links;
             var maxLinksLength = configManager.GetCVar(CCVars.LinksLength);
             if (LinksFlavorText.Length > maxLinksLength)
@@ -944,7 +993,7 @@ namespace Content.Shared.Preferences
                          .Where(prototypeManager.HasIndex)
                          .ToList();
 
-             // Corvax-TTS-Start
+            // Corvax-TTS-Start
             prototypeManager.TryIndex<TTSVoicePrototype>(Voice, out var voice);
             if (voice is null || !CanHaveVoice(voice, Sex))
                 Voice = HumanoidProfileSystem.DefaultSexVoice[sex];
@@ -966,6 +1015,8 @@ namespace Content.Shared.Preferences
             NSFWTagsFlavorText = nsfwtags;
             CustomSpecies = customSpecies;
             // Erida-End
+            Height = height; // Goobstation: port EE height/width sliders
+            Width = width; // Goobstation: port EE height/width sliders
             Age = age;
             Sex = sex;
             Gender = gender;
@@ -1026,11 +1077,11 @@ namespace Content.Shared.Preferences
                     continue;
 
                 // Always valid.
-                if (traitProto.Category == null)
-                {
-                    result.Add(trait);
-                    continue;
-                }
+                // if (traitProto.Category == null) // DeltaV 13/01/26 - Traits rework
+                // {
+                //     result.Add(trait);
+                //     continue;
+                // }
 
                 // No category so dump it.
                 if (!protoManager.Resolve(traitProto.Category, out var category))
@@ -1040,7 +1091,7 @@ namespace Content.Shared.Preferences
                 existing += traitProto.Cost;
 
                 // Too expensive.
-                if (existing > category.MaxTraitPoints)
+                if (existing > category.MaxPoints) // DeltaV 13/01/26 - Traits:  Was MaxTraitPoints
                     continue;
 
                 groups[category.ID] = existing;
@@ -1109,6 +1160,8 @@ namespace Content.Shared.Preferences
             // Erida-End
             hashCode.Add(Species);
             hashCode.Add(CustomSpecies); // Erida edit
+            hashCode.Add(Height); // Goobstation: port EE height/width sliders
+            hashCode.Add(Width); // Goobstation: port EE height/width sliders
             hashCode.Add(Voice); // Corvax-TTS
             hashCode.Add(Age);
             hashCode.Add((int)Sex);

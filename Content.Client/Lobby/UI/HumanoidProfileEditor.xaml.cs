@@ -34,8 +34,10 @@ using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using Direction = Robust.Shared.Maths.Direction;
-using Content.Shared.CCVar;
 using Content.Shared._Erida.Preference;
+using Robust.Shared.Physics.Systems;
+using Robust.Shared.Physics;
+using Content.Shared._DV.Traits; // DV - Traits
 
 namespace Content.Client.Lobby.UI
 {
@@ -186,6 +188,8 @@ namespace Content.Client.Lobby.UI
                 Save?.Invoke();
             };
 
+            Traits.OnTraitsChanged += OnTraitsSelectionChanged; // DeltaV
+
             #region Left
 
             #region Name
@@ -250,6 +254,7 @@ namespace Content.Client.Lobby.UI
                 _markingsModel.Markings = [];
                 UpdateMarkings();
                 // Erida end
+                UpdateHeightWidthSliders(); // Goobstation: port EE height/width sliders
             };
 
             // Erida-start
@@ -267,6 +272,33 @@ namespace Content.Client.Lobby.UI
                 if (!string.IsNullOrEmpty(formattedMessage))
                     SetCustomSpecies(formattedMessage);
             };
+            // Erida end
+
+            // begin Goobstation: port EE height/width sliders
+            #region Height and Width
+
+            UpdateHeightWidthSliders();
+            UpdateDimensions(SliderUpdate.Both);
+
+            HeightSlider.OnValueChanged += _ => UpdateDimensions(SliderUpdate.Height);
+            WidthSlider.OnValueChanged += _ => UpdateDimensions(SliderUpdate.Width);
+
+            HeightReset.OnPressed += _ =>
+            {
+                var prototype = _species.Find(x => x.ID == Profile?.Species) ?? _species.First();
+                HeightSlider.Value = prototype.DefaultHeight;
+                UpdateDimensions(SliderUpdate.Height);
+            };
+
+            WidthReset.OnPressed += _ =>
+            {
+                var prototype = _species.Find(x => x.ID == Profile?.Species) ?? _species.First();
+                WidthSlider.Value = prototype.DefaultWidth;
+                UpdateDimensions(SliderUpdate.Width);
+            };
+
+            #endregion Height and Width
+            // end Goobstation: port EE height/width sliders
 
             #region Skin
 
@@ -368,7 +400,7 @@ namespace Content.Client.Lobby.UI
 
             TabContainer.SetTabTitle(2, Loc.GetString("humanoid-profile-editor-antags-tab"));
 
-            RefreshTraits();
+            // RefreshTraits(); // DeltaV
 
             #region Markings
 
@@ -408,6 +440,60 @@ namespace Content.Client.Lobby.UI
             UpdateSpeciesGuidebookIcon();
             IsDirty = false;
         }
+
+        // Begin DeltaV - Traits Integration
+        /// <summary>
+        /// Called when trait selection changes in the TraitsTab.
+        /// Updates the profile with the new trait selection.
+        /// </summary>
+        private void OnTraitsSelectionChanged(HashSet<ProtoId<TraitPrototype>> traits)
+        {
+            if (Profile is null)
+                return;
+
+            // Remove all existing traits - iterate directly over readonly collection
+            foreach (var existingTrait in Profile.TraitPreferences)
+            {
+                Profile = Profile.WithoutTraitPreference(existingTrait, _prototypeManager);
+            }
+
+            // Add newly selected traits
+            foreach (var trait in traits)
+            {
+                Profile = Profile.WithTraitPreference(trait.Id, _prototypeManager);
+            }
+
+            SetDirty();
+        }
+
+        /// <summary>
+        /// Updates the traits tab with the current profile's selected traits.
+        /// </summary>
+        private void UpdateTraitsSelection()
+        {
+            if (Profile is null)
+            {
+                Traits.SetSelectedTraits(new HashSet<ProtoId<TraitPrototype>>());
+                return;
+            }
+
+            TabContainer.SetTabTitle(3, Loc.GetString("humanoid-profile-editor-traits-tab"));
+
+            // Convert profile's trait preferences (strings) to ProtoId<TraitPrototype>
+            var selectedTraits = new HashSet<ProtoId<TraitPrototype>>(Profile.TraitPreferences.Count);
+            foreach (var traitId in Profile.TraitPreferences)
+            {
+                // Validate that the trait still exists in prototypes
+                if (_prototypeManager.HasIndex(traitId))
+                {
+                    selectedTraits.Add(new ProtoId<TraitPrototype>(traitId));
+                }
+            }
+
+            Traits.SetSelectedTraits(selectedTraits);
+            Traits.UpdateConditions(Profile.Species);
+        }
+        // End DeltaV - Traits Integration
 
         /// <summary>
         /// Refreshes the flavor text editor status.
@@ -610,114 +696,122 @@ namespace Content.Client.Lobby.UI
         /// <summary>
         /// Refreshes traits selector
         /// </summary>
-        public void RefreshTraits()
-        {
-            TraitsList.RemoveAllChildren();
-
-            var traits = _prototypeManager.EnumeratePrototypes<TraitPrototype>().OrderBy(t => Loc.GetString(t.Name)).ToList();
-            TabContainer.SetTabTitle(3, Loc.GetString("humanoid-profile-editor-traits-tab"));
-
-            if (traits.Count < 1)
-            {
-                TraitsList.AddChild(new Label
-                {
-                    Text = Loc.GetString("humanoid-profile-editor-no-traits"),
-                    FontColorOverride = Color.Gray,
-                });
-                return;
-            }
-
-            // Setup model
-            Dictionary<string, List<string>> traitGroups = new();
-            List<string> defaultTraits = new();
-            traitGroups.Add(TraitCategoryPrototype.Default, defaultTraits);
-
-            foreach (var trait in traits)
-            {
-                if (trait.Category == null)
-                {
-                    defaultTraits.Add(trait.ID);
-                    continue;
-                }
-
-                if (!_prototypeManager.HasIndex(trait.Category))
-                    continue;
-
-                var group = traitGroups.GetOrNew(trait.Category);
-                group.Add(trait.ID);
-            }
-
-            // Create UI view from model
-            foreach (var (categoryId, categoryTraits) in traitGroups)
-            {
-                TraitCategoryPrototype? category = null;
-
-                if (categoryId != TraitCategoryPrototype.Default)
-                {
-                    category = _prototypeManager.Index<TraitCategoryPrototype>(categoryId);
-                    // Label
-                    TraitsList.AddChild(new Label
-                    {
-                        Text = Loc.GetString(category.Name),
-                        Margin = new Thickness(0, 10, 0, 0),
-                        StyleClasses = { StyleClass.LabelHeading },
-                    });
-                }
-
-                List<TraitPreferenceSelector?> selectors = new();
-                var selectionCount = 0;
-
-                foreach (var traitProto in categoryTraits)
-                {
-                    var trait = _prototypeManager.Index<TraitPrototype>(traitProto);
-                    var selector = new TraitPreferenceSelector(trait);
-
-                    selector.Preference = Profile?.TraitPreferences.Contains(trait.ID) == true;
-                    if (selector.Preference)
-                        selectionCount += trait.Cost;
-
-                    selector.PreferenceChanged += preference =>
-                    {
-                        if (preference)
-                        {
-                            Profile = Profile?.WithTraitPreference(trait.ID, _prototypeManager);
-                        }
-                        else
-                        {
-                            Profile = Profile?.WithoutTraitPreference(trait.ID, _prototypeManager);
-                        }
-
-                        SetDirty();
-                        RefreshTraits(); // If too many traits are selected, they will be reset to the real value.
-                    };
-                    selectors.Add(selector);
-                }
-
-                // Selection counter
-                if (category is { MaxTraitPoints: >= 0 })
-                {
-                    TraitsList.AddChild(new Label
-                    {
-                        Text = Loc.GetString("humanoid-profile-editor-trait-count-hint", ("current", selectionCount) ,("max", category.MaxTraitPoints)),
-                        FontColorOverride = Color.Gray
-                    });
-                }
-
-                foreach (var selector in selectors)
-                {
-                    if (selector == null)
-                        continue;
-
-                    if (category is { MaxTraitPoints: >= 0 } &&
-                        selector.Cost + selectionCount > category.MaxTraitPoints)
-                    {
-                        selector.Checkbox.Label.FontColorOverride = Color.Red;
-                    }
-
-                    TraitsList.AddChild(selector);
-                }
-            }
-        }
+        // public void RefreshTraits()
+        // {
+        //     TraitsList.RemoveAllChildren();
+        //
+        //     var traits = _prototypeManager.EnumeratePrototypes<TraitPrototype>().OrderBy(t => Loc.GetString(t.Name)).ToList();
+        //     TabContainer.SetTabTitle(3, Loc.GetString("humanoid-profile-editor-traits-tab"));
+        //
+        //     if (traits.Count < 1)
+        //     {
+        //         TraitsList.AddChild(new Label
+        //         {
+        //             Text = Loc.GetString("humanoid-profile-editor-no-traits"),
+        //             FontColorOverride = Color.Gray,
+        //         });
+        //         return;
+        //     }
+        //
+        //     // Setup model
+        //     Dictionary<string, List<string>> traitGroups = new();
+        //     List<string> defaultTraits = new();
+        //     traitGroups.Add(TraitCategoryPrototype.Default, defaultTraits);
+        //
+        //     foreach (var trait in traits)
+        //     {
+        //         // Begin DeltaV Additions - Species trait exclusion
+        //         if (Profile?.Species is { } selectedSpecies && trait.ExcludedSpecies.Contains(selectedSpecies))
+        //         {
+        //             Profile = Profile?.WithoutTraitPreference(trait.ID, _prototypeManager);
+        //             continue;
+        //         }
+        //         // End DeltaV Additions
+        //
+        //         if (trait.Category == null)
+        //         {
+        //             defaultTraits.Add(trait.ID);
+        //             continue;
+        //         }
+        //
+        //         if (!_prototypeManager.HasIndex(trait.Category))
+        //             continue;
+        //
+        //         var group = traitGroups.GetOrNew(trait.Category);
+        //         group.Add(trait.ID);
+        //     }
+        //
+        //     // Create UI view from model
+        //     foreach (var (categoryId, categoryTraits) in traitGroups)
+        //     {
+        //         TraitCategoryPrototype? category = null;
+        //
+        //         if (categoryId != TraitCategoryPrototype.Default)
+        //         {
+        //             category = _prototypeManager.Index<TraitCategoryPrototype>(categoryId);
+        //             // Label
+        //             TraitsList.AddChild(new Label
+        //             {
+        //                 Text = Loc.GetString(category.Name),
+        //                 Margin = new Thickness(0, 10, 0, 0),
+        //                 StyleClasses = { StyleClass.LabelHeading },
+        //             });
+        //         }
+        //
+        //         List<TraitPreferenceSelector?> selectors = new();
+        //         var selectionCount = 0;
+        //
+        //         foreach (var traitProto in categoryTraits)
+        //         {
+        //             var trait = _prototypeManager.Index<TraitPrototype>(traitProto);
+        //             var selector = new TraitPreferenceSelector(trait);
+        //
+        //             selector.Preference = Profile?.TraitPreferences.Contains(trait.ID) == true;
+        //             if (selector.Preference)
+        //                 selectionCount += trait.Cost;
+        //
+        //             selector.PreferenceChanged += preference =>
+        //             {
+        //                 if (preference)
+        //                 {
+        //                     Profile = Profile?.WithTraitPreference(trait.ID, _prototypeManager);
+        //                 }
+        //                 else
+        //                 {
+        //                     Profile = Profile?.WithoutTraitPreference(trait.ID, _prototypeManager);
+        //                 }
+        //
+        //                 SetDirty();
+        //                 RefreshTraits(); // If too many traits are selected, they will be reset to the real value.
+        //             };
+        //             selectors.Add(selector);
+        //         }
+        //
+        //         // Selection counter
+        //         if (category is { MaxTraitPoints: >= 0 })
+        //         {
+        //             TraitsList.AddChild(new Label
+        //             {
+        //                 Text = Loc.GetString("humanoid-profile-editor-trait-count-hint", ("current", selectionCount) ,("max", category.MaxTraitPoints)),
+        //                 FontColorOverride = Color.Gray
+        //             });
+        //         }
+        //
+        //         foreach (var selector in selectors)
+        //         {
+        //             if (selector == null)
+        //                 continue;
+        //
+        //             if (category is { MaxTraitPoints: >= 0 } &&
+        //                 selector.Cost + selectionCount > category.MaxTraitPoints)
+        //             {
+        //                 selector.Checkbox.Label.FontColorOverride = Color.Red;
+        //             }
+        //
+        //             TraitsList.AddChild(selector);
+        //         }
+        //     }
+        // }
 
         /// <summary>
         /// Refreshes the species selector.
@@ -887,13 +981,17 @@ namespace Content.Client.Lobby.UI
             UpdateTTSVoicesControls(); // Corvax-TTS
             UpdateCorporationControls(); // Erida edit
             UpdateCustomSpeciesEdit(); // Erida edit
+            UpdateHeightWidthSliders(); // Goobstation: port EE height/width sliders
+            UpdateWeight(); // Goobstation: port EE height/width sliders
 
+
+            UpdateTraitsSelection(); // DeltaV - Traits
 
             RefreshAntags();
             RefreshJobs();
             RefreshLoadouts();
             RefreshSpecies();
-            RefreshTraits();
+            // RefreshTraits(); // DeltaV
             RefreshFlavorText();
             ReloadPreview();
 
@@ -1489,6 +1587,22 @@ namespace Content.Client.Lobby.UI
         }
         // Erida end
 
+        // Goob Station - Start
+        private void SetProfileHeight(float height)
+        {
+            Profile = Profile?.WithHeight(height);
+            ReloadProfilePreview();
+            IsDirty = true;
+        }
+
+        private void SetProfileWidth(float width)
+        {
+            Profile = Profile?.WithWidth(width);
+            ReloadProfilePreview();
+            IsDirty = true;
+        }
+        // Goob Station - End
+
 
         public bool IsDirty
         {
@@ -1725,6 +1839,104 @@ namespace Content.Client.Lobby.UI
 
             SpawnPriorityButton.SelectId((int) Profile.SpawnPriority);
         }
+
+        // begin Goobstation: port EE height/width sliders
+        private void UpdateHeightWidthSliders()
+        {
+            if (Profile is null)
+                return;
+
+            var species = _species.Find(x => x.ID == Profile?.Species) ?? _species.First();
+
+            // we increase the min/max values of the sliders before we set their value, just so that we don't accidentally clamp down on a value loaded from a profile when we shouldn't
+            HeightSlider.MinValue = 0;
+            HeightSlider.MaxValue = 2;
+            HeightSlider.SetValueWithoutEvent(Profile?.Height ?? species.DefaultHeight);
+            HeightSlider.MinValue = species.MinHeight;
+            HeightSlider.MaxValue = species.MaxHeight;
+
+            WidthSlider.MinValue = 0;
+            WidthSlider.MaxValue = 2;
+            WidthSlider.SetValueWithoutEvent(Profile?.Width ?? species.DefaultWidth);
+            WidthSlider.MinValue = species.MinWidth;
+            WidthSlider.MaxValue = species.MaxWidth;
+
+            var height = MathF.Round(species.AverageHeight * HeightSlider.Value);
+            HeightLabel.Text = Loc.GetString("humanoid-profile-editor-height-label", ("height", (int) height));
+
+            var width = MathF.Round(species.AverageWidth * WidthSlider.Value);
+            WidthLabel.Text = Loc.GetString("humanoid-profile-editor-width-label", ("width", (int) width));
+
+            UpdateDimensions(SliderUpdate.Both);
+        }
+
+        private enum SliderUpdate
+        {
+            Height,
+            Width,
+            Both
+        }
+
+        private void UpdateDimensions(SliderUpdate updateType)
+        {
+            if (Profile == null)
+                return;
+
+            var species = _species.Find(x => x.ID == Profile?.Species) ?? _species.First();
+
+            var heightValue = Math.Clamp(HeightSlider.Value, species.MinHeight, species.MaxHeight);
+            var widthValue = Math.Clamp(WidthSlider.Value, species.MinWidth, species.MaxWidth);
+            var sizeRatio = species.SizeRatio;
+            var ratio = heightValue / widthValue;
+
+            if (updateType == SliderUpdate.Height || updateType == SliderUpdate.Both)
+                if (ratio < 1 / sizeRatio || ratio > sizeRatio)
+                    widthValue = heightValue / (ratio < 1 / sizeRatio ? (1 / sizeRatio) : sizeRatio);
+
+            if (updateType == SliderUpdate.Width || updateType == SliderUpdate.Both)
+                if (ratio < 1 / sizeRatio || ratio > sizeRatio)
+                    heightValue = widthValue * (ratio < 1 / sizeRatio ? (1 / sizeRatio) : sizeRatio);
+
+            heightValue = Math.Clamp(heightValue, species.MinHeight, species.MaxHeight);
+            widthValue = Math.Clamp(widthValue, species.MinWidth, species.MaxWidth);
+
+            HeightSlider.SetValueWithoutEvent(heightValue);
+            WidthSlider.SetValueWithoutEvent(widthValue);
+
+            SetProfileHeight(heightValue);
+            SetProfileWidth(widthValue);
+
+            var height = MathF.Round(species.AverageHeight * HeightSlider.Value);
+            HeightLabel.Text = Loc.GetString("humanoid-profile-editor-height-label", ("height", (int) height));
+
+            var width = MathF.Round(species.AverageWidth * WidthSlider.Value);
+            WidthLabel.Text = Loc.GetString("humanoid-profile-editor-width-label", ("width", (int) width));
+
+            UpdateWeight();
+        }
+
+        private void UpdateWeight()
+        {
+            if (Profile == null)
+                return;
+
+            var species = _species.Find(x => x.ID == Profile.Species) ?? _species.First();
+            //  TODO: Remove obsolete method
+            _prototypeManager.Index(species.Prototype).TryGetComponent<FixturesComponent>(out var fixture, _entManager.ComponentFactory);
+
+            if (fixture != null)
+            {
+                var avg = (Profile.Width + Profile.Height) / 2;
+                var weight = FixtureSystem.GetMassData(fixture.Fixtures["fix1"].Shape, fixture.Fixtures["fix1"].Density).Mass * avg;
+                WeightLabel.Text = Loc.GetString("humanoid-profile-editor-weight-label", ("weight", (int)weight));
+            }
+            else // Whelp, the fixture doesn't exist, guesstimate it instead
+                WeightLabel.Text = Loc.GetString("humanoid-profile-editor-weight-label", ("weight", (int)71));
+
+            if (SpriteView.Sprite != null)
+                _sprite.SetScale((SpriteView.PreviewDummy, SpriteView.Sprite), new Vector2(Profile.Width, Profile.Height));
+        }
+        // end Goobstation: port EE height/width sliders
 
         private void UpdateEyePickers()
         {
