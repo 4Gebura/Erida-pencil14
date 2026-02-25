@@ -22,6 +22,11 @@ using Robust.Shared.Containers;
 using Content.Server._Erida.Inferior.Components;
 using Content.Server.Administration.Logs;
 using Content.Shared.Database;
+using Content.Shared.Verbs;
+using Robust.Shared.Profiling;
+using Content.Shared.NPC.Components;
+using Robust.Shared.Utility;
+using System.Linq;
 
 namespace Content.Server._Erida.Inferior;
 
@@ -44,12 +49,12 @@ public sealed class InferiorSystem : SharedInferiorSystem
         SubscribeLocalEvent<InferiorImplantComponent, EntGotInsertedIntoContainerMessage>(OnInsert);
         SubscribeLocalEvent<InferiorImplantComponent, EntGotRemovedFromContainerMessage>(OnRemove);
         SubscribeLocalEvent<InferiorImplantComponent, ImplantImplantedEvent>(OnImplantImplanted);
+        SubscribeLocalEvent<InferiorVerbsComponent, GetVerbsEvent<AlternativeVerb>>(AddVerbTBecomeOverlord);
 
         SubscribeLocalEvent<InferiorComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<InferiorComponent, ComponentShutdown>(OnShutdown);
 
-        //SubscribeLocalEvent<InferiorImplantComponent, ImplantRemovedEvent>(OnImplantRemoved);
-        SubscribeLocalEvent<StoreBuyFinishedEvent>(StoreBuyFinishedEvent);
+        //SubscribeLocalEvent<StoreBuyFinishedEvent>(StoreBuyFinishedEvent);
         SubscribeLocalEvent<InferiorRoleComponent, GetBriefingEvent>(OnGetBriefing);
         SubscribeLocalEvent<InferiorComponent, MindAddedMessage>(OnMindAdded);
         SubscribeLocalEvent<InferiorComponent, MindRemovedMessage>(OnMindRemoved);
@@ -81,6 +86,14 @@ public sealed class InferiorSystem : SharedInferiorSystem
         else
             return;
 
+        if (TryComp<NpcFactionMemberComponent>(comp.Overlord, out var nPCComp))
+        {
+            EnsureComp<NpcFactionMemberComponent>(ev.Implanted, out var nPCImComp);
+            comp.OldFactions = [.. nPCImComp.Factions];
+            _npcFaction.ClearFactions(ev.Implanted);
+            _npcFaction.AddFactions(ev.Implanted, nPCComp.Factions);
+        }
+
         entity.Comp.ImplanterUid = null;
         Start(ev.Implanted, comp);
     }
@@ -95,9 +108,6 @@ public sealed class InferiorSystem : SharedInferiorSystem
             return;
         }
 
-        _npcFaction.RemoveFaction(uid, NanoTrasenFaction, false);
-        _npcFaction.AddFaction(uid, SyndicateFaction);
-
         _role.MindAddRole(mindId, "MindRoleInferior");
         if (_role.MindHasRole<InferiorRoleComponent>(mindId, out var infRole))
         {
@@ -111,6 +121,30 @@ public sealed class InferiorSystem : SharedInferiorSystem
 
         if (mind is { UserId: not null } && _player.TryGetSessionById(mind.UserId, out var session))
             _antag.SendBriefing(session, Loc.GetString("inferior-role-greeting", ("overlord", infRole.Value.Comp2.Overlord)), null, comp.InfStartSound);
+    }
+    private void AddVerbTBecomeOverlord(EntityUid uid, InferiorVerbsComponent comp, GetVerbsEvent<AlternativeVerb> args)
+    {
+        if (!args.CanInteract || !args.CanAccess)
+            return;
+
+        if (!TryComp<ImplanterComponent>(args.Target, out var compImp)
+            || compImp.ImplanterSlot.ContainerSlot == null
+            || compImp.ImplanterSlot.ContainerSlot.ContainedEntity == null
+            || !TryComp<InferiorImplantComponent>(compImp.ImplanterSlot.ContainerSlot.ContainedEntity, out var compInf)
+            || compInf.Overlord != null)
+            return;
+
+        AlternativeVerb verb = new()
+        {
+            Act = () =>
+            {
+                compInf.Overlord = args.User;
+            },
+            Text = Loc.GetString("inferior-become-overlord"),
+            Priority = 3
+        };
+
+        args.Verbs.Add(verb);
     }
     private void OnMindAdded(EntityUid uid, InferiorComponent component, MindAddedMessage args)
     {
@@ -133,21 +167,16 @@ public sealed class InferiorSystem : SharedInferiorSystem
     }
     public void OnShutdown(EntityUid uid, InferiorComponent component, ComponentShutdown arg)
     {
+        if (TryComp<NpcFactionMemberComponent>(uid, out var _)
+            && component.OldFactions != null)
+        {
+            _npcFaction.ClearFactions(uid);
+            _npcFaction.AddFactions(uid, component.OldFactions);
+        }
         _sharedStun.TryUpdateParalyzeDuration(uid, TimeSpan.FromSeconds(5f));
         if (_mindSystem.TryGetMind(uid, out var mindId, out _))
             _role.MindRemoveRole<InferiorRoleComponent>(mindId);
         _popupSystem.PopupEntity(Loc.GetString("inferior-popup-stop"), uid, PopupType.Large);
         _adminLogManager.Add(LogType.Mind, LogImpact.Medium, $"{ToPrettyString(uid)} is no longer Inferior.");
-    }
-    private void StoreBuyFinishedEvent(ref StoreBuyFinishedEvent ev)
-    {
-        if (ev.PurchasedItemEntity != null
-            && TryComp<ImplanterComponent>(ev.PurchasedItemEntity.Value, out var compImp)
-            && compImp.ImplanterSlot.ContainerSlot != null
-            && compImp.ImplanterSlot.ContainerSlot.ContainedEntity != null
-            && TryComp<InferiorImplantComponent>(compImp.ImplanterSlot.ContainerSlot.ContainedEntity, out var compInf))
-        {
-            compInf.Overlord = ev.User;
-        }
     }
 }

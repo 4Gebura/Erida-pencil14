@@ -291,9 +291,7 @@ public sealed partial class StoreSystem
         var buyFinished = new StoreBuyFinishedEvent
         {
             PurchasedItem = listing,
-            StoreUid = uid,
-            PurchasedItemEntity = EvProduct,
-            User = msg.Actor
+            StoreUid = uid
         };
         RaiseLocalEvent(ref buyFinished);
 
@@ -423,7 +421,5 @@ public sealed partial class StoreSystem
 [ByRefEvent]
 public readonly record struct StoreBuyFinishedEvent(
     EntityUid StoreUid,
-    ListingDataWithCostModifiers PurchasedItem,
-    EntityUid? PurchasedItemEntity, // Erida-edit
-    EntityUid User
+    ListingDataWithCostModifiers PurchasedItem
 );

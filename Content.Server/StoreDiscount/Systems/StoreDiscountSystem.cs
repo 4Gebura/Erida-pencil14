@@ -31,7 +31,7 @@ public sealed class StoreDiscountSystem : EntitySystem
     /// <summary> Decrements discounted item count, removes discount modifier and category, if counter reaches zero. </summary>
     private void OnBuyFinished(ref StoreBuyFinishedEvent ev)
     {
-        var (storeId, purchasedItem, _, __) = ev; // Erida-edit
+        var (storeId, purchasedItem) = ev;
         if (!TryComp<StoreDiscountComponent>(storeId, out var discountsComponent))
         {
             return;

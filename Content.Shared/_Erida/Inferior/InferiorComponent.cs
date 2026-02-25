@@ -1,6 +1,8 @@
 using Content.Shared._Erida.Inferior;
+using Content.Shared.NPC.Prototypes;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Erida.Inferior.Components;
 
@@ -11,4 +13,6 @@ public sealed partial class InferiorComponent : Component
     public EntityUid? Overlord = null;
     [DataField]
     public SoundSpecifier InfStartSound = new SoundPathSpecifier("/Audio/Ambience/Antag/headrev_start.ogg");
+    [DataField]
+    public HashSet<ProtoId<NpcFactionPrototype>>? OldFactions;
 }
