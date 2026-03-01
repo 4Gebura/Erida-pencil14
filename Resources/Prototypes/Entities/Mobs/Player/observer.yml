@@ -110,6 +110,7 @@
     baseWalkSpeed : 22
     baseSprintSpeed : 12
   - type: BkmSupermatterImmune #backmen
+  - type: UniversalLanguageSpeaker
 
 # proto for player ghosts specifically
 - type: entity

@@ -9,7 +9,15 @@
 - type: species
   id: Felinid
   name: species-name-human
-  roundStart: true
+  roundStart: false
+  prototype: MobHuman
+  dollPrototype: AppearanceHuman
+  skinColoration: HumanToned
+
+- type: species
+  id: Shark
+  name: species-name-human
+  roundStart: false
   prototype: MobHuman
   dollPrototype: AppearanceHuman
   skinColoration: HumanToned
@@ -17,7 +25,7 @@
 - type: species
   id: Anthropomorph
   name: species-name-human
-  roundStart: true
+  roundStart: false
   prototype: MobHuman
   dollPrototype: AppearanceHuman
   skinColoration: HumanToned
