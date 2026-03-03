@@ -61,7 +61,7 @@ public sealed class ApcSystem : EntitySystem
             }
 
             // Overload
-            if (apc.MainBreakerEnabled && battery.CurrentSupply > apc.MaxLoad)
+            if (apc.CanBeOverloaded && apc.MainBreakerEnabled && battery.CurrentSupply > apc.MaxLoad)
             {
                 // Not already overloaded, start timer
                 if (apc.TripStartTime == null)
@@ -163,7 +163,7 @@ public sealed class ApcSystem : EntitySystem
     }
 
     public void UpdateApcState(EntityUid uid,
-        ApcComponent? apc=null,
+        ApcComponent? apc = null,
         PowerNetworkBatteryComponent? battery = null)
     {
         if (!Resolve(uid, ref apc, ref battery, false))
@@ -209,7 +209,7 @@ public sealed class ApcSystem : EntitySystem
         var charge = ContentHelpers.RoundToNearestLevels(battery.CurrentStorage / battery.Capacity, 1.0, 100 / ChargeAccuracy) / 100f * ChargeAccuracy;
 
         var state = new ApcBoundInterfaceState(apc.MainBreakerEnabled,
-            (int) MathF.Ceiling(battery.CurrentSupply), apc.LastExternalState,
+            (int)MathF.Ceiling(battery.CurrentSupply), apc.LastExternalState,
             charge,
             apc.MaxLoad,
             apc.TripFlag);

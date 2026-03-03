@@ -24,7 +24,7 @@ public sealed partial class ApcComponent : BaseApcNetComponent
     public TimeSpan LastUiUpdate;
 
     [DataField("enabled")]
-    public bool MainBreakerEnabled = false; // Erida edit
+    public bool MainBreakerEnabled = true;
 
     /// <summary>
     /// APC state needs to always be updated after first processing tick.
@@ -59,6 +59,11 @@ public sealed partial class ApcComponent : BaseApcNetComponent
     /// </summary>
     [DataField]
     public bool TripFlag;
+
+    // Erida start
+    [DataField]
+    public bool CanBeOverloaded = false;
+    // Erida end
 
     // TODO ECS power a little better!
     // End the suffering
