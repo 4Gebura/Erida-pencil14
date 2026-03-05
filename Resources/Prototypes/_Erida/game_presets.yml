@@ -5,7 +5,7 @@
   description: calm-description
   rules:
   - BasicCalmStationEventScheduler
-  - MeteorSwarmScheduler
+  # - MeteorSwarmScheduler # Erida edit
   - BasicRoundstartVariation
 
 - type: gamePreset
@@ -14,7 +14,7 @@
   showInVote: false
   description: light-dynamic-description
   rules:
-  - MeteorSwarmScheduler
+  # - MeteorSwarmScheduler # Erida edit
   - BasicRoundstartVariation
   - LightDynamicScheduler
 
@@ -25,7 +25,7 @@
   description: hard-dynamic-description
   rules:
   - RampingStationEventScheduler
-  - MeteorSwarmScheduler
+  # - MeteorSwarmScheduler # Erida edit
   - SpaceTrafficControlEventScheduler
   - BasicRoundstartVariation
   - HardDynamicScheduler
