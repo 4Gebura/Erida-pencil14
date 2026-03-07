@@ -1000,6 +1000,11 @@ namespace Content.Client.Lobby.UI
 
             SpriteView.ReloadProfilePreview(Profile);
 
+            // Erida start
+            if (SpriteView.Sprite != null)
+                _sharedScaleVisualsSystem.SetSpriteScale(SpriteView.PreviewDummy, new Vector2(Profile.Width, Profile.Height));
+            // Erida end
+
             // Check and set the dirty flag to enable the save/reset buttons as appropriate.
             SetDirty();
         }
