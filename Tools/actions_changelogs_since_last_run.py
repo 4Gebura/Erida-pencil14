@@ -240,7 +240,7 @@ def entry_to_embed(entry: ChangelogEntry) -> dict:
             "icon_url": entry.get("avatar_url"),
         },
         "url": entry.get("url"),
-        "timestamp": entry["timestamp"],
+        "timestamp": entry["time"],
     }
 
     return embed
