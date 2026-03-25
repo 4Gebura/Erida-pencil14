@@ -63,7 +63,7 @@
   id: RuleC1
   name: guide-entry-rules-c1
   ruleEntry: true
-  text: "/ServerInfo/Guidebook/ServerRules/CoreRules/RuleC1.xml"
+  text: "/ServerInfo/Guidebook/ServerRules/CoreRules/RuleC1Admins.xml"
 
 - type: guideEntry
   id: RuleC2
